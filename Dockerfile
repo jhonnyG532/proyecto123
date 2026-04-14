@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY config.py .
 COPY proyecto.py .
+COPY .env .
 
 # Permisos
 RUN chown -R appuser:appuser /app

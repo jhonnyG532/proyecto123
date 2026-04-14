@@ -10,8 +10,11 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or secrets.token_hex(64)
     
     # Base de datos
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 
-        'sqlite:///' + os.path.join(BASE_DIR, 'cafeteria.db'))
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        SQLALCHEMY_DATABASE_URI = db_url
+    else:
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'cafeteria.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Seguridad JWT
