@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Sugerencias - {{ config.nombre_negocio }}{% endblock %}
+{% block content %}
+<style>
+.page-header { background: linear-gradient(135deg, #2c1810, #8b4513); padding: 80px 0 60px; margin-bottom: 40px; border-radius: 0 0 40% 10% / 0 0 10% 40%; position: relative; overflow: hidden;}
+.page-header::after { content: ''; position: absolute; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; top: -20px; left: -20px; animation: spin 8s linear infinite;}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes cardEnter { 0% { opacity: 0; transform: translateY(50px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+.card { border: none; border-radius: 40px 10px 40px 10px; box-shadow: -10px 15px 35px rgba(0,0,0,0.1); background: #fffdfa; animation: cardEnter 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;}
+.card:hover { transform: translateY(-5px); box-shadow: -15px 25px 45px rgba(0,0,0,0.15); border-radius: 10px 40px 10px 40px; }
+.form-control, .form-select { border: 2px solid #e9ecef; border-radius: 15px 5px 15px 5px; }
+.form-control:focus, .form-select:focus { border-radius: 5px 15px 5px 15px; border-color: #8b4513; box-shadow: none; }
+.star-rating { direction: rtl; display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+.star-rating input { display: none; }
+.star-rating label { font-size: 2.2rem; color: #eee; cursor: pointer; transition: transform 0.2s; }
+.star-rating input:checked ~ label,
+.star-rating input:checked + label,
+.star-rating input:checked + label ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label { color: #ffc107; transform: scale(1.1) rotate(5deg); }
+.custom-radio .form-check-input { width: 40px; height: 40px; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transition: all 0.3s; }
+.custom-radio .form-check-input:checked { transform: scale(1.1) rotate(15deg); }
+.custom-radio .form-check-label { cursor: pointer; font-weight: 700;}
+.btn-success { background: #d4a574; border: none; border-radius: 10px 30px 10px 30px; font-weight: 800; color: #2c1810; }
+.btn-success:hover { background: #8b4513; transform: translateY(-3px) scale(1.02); border-radius: 30px 10px 30px 10px; color: #fff;}
+</style>
+<div class="page-header text-center text-white">
+    <div class="container">
+        <h1><i class="bi bi-lightbulb"></i> Sugerencias</h1>
+        <p class="lead">Tu opinión nos ayuda a mejorar</p>
+    </div>
+</div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form id="formSugerencia">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label">Tu nombre</label>
+                                <input type="text" class="form-control" id="sugNombre" placeholder="Escribe tu nombre">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono (opcional)</label>
+                                <input type="tel" class="form-control" id="sugTelefono" placeholder="300 123 4567">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Tipo de mensaje</label>
+                            <div class="row">
+                                <div class="col-6 col-md-3 mb-2">
+                                    <div class="form-check custom-radio">
+                                        <input class="form-check-input" type="radio" name="tipo" id="tipo1" value="sugerencia" checked>
+                                        <label class="form-check-label" for="tipo1"><i class="bi bi-lightbulb d-block mb-1"></i> Sugerencia</label>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-2">
+                                    <div class="form-check custom-radio">
+                                        <input class="form-check-input" type="radio" name="tipo" id="tipo2" value="queja">
+                                        <label class="form-check-label" for="tipo2"><i class="bi bi-emoji-angry d-block mb-1"></i> Queja</label>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3 mb-2">
+                                    <div class="form-check custom-radio">
+                                        <input class="form-check-input" type="radio" name="tipo" id="tipo3" value="felicitacion">
+                                        <label class="form-check-label" for="tipo3"><i class="bi bi-heart d-block mb-1"></i> Felicitaciones</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Tu opinión</label>
+                            <textarea class="form-control" id="sugMensaje" rows="4" placeholder="¿Qué opinas de nuestros productos?"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">¿Cómo calificarías?</label>
+                            <div class="star-rating">
+                                <input type="radio" name="rating" id="star5" value="5" checked><label for="star5">★</label>
+                                <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+                                <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+                                <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+                                <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-send"></i> Enviar Sugerencia
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function mostrarToast(msg, tipo) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + tipo;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+}
+document.getElementById('formSugerencia').onsubmit = async (e) => {
+    e.preventDefault();
+    const mensaje = document.getElementById('sugMensaje').value.trim();
+    if (!mensaje) return mostrarToast('⚠️ Escribe tu mensaje', 'error');
+    const tipo = document.querySelector('input[name="tipo"]:checked').value;
+    const rating = document.querySelector('input[name="rating"]:checked').value;
+    try {
+        const res = await fetch('/api/sugerencias', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                tipo: tipo,
+                mensaje: mensaje,
+                nombre: document.getElementById('sugNombre').value || 'Anónimo',
+                telefono: document.getElementById('sugTelefono').value,
+                rating: rating
+            })
+        });
+        const data = await res.json();
+        if (data.mensaje) {
+            mostrarToast('✅ ' + data.mensaje, 'success');
+            e.target.reset();
+            document.getElementById('star5').checked = true;
+        }
+    } catch (e) {
+        mostrarToast('❌ Error al enviar', 'error');
+    }
+};
+</script>
+{% endblock %}

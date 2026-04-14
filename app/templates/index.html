@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+:root { 
+    --primary: #2c1810; 
+    --secondary: #8b4513; 
+    --accent: #d4a574; 
+    --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+    --asymmetric-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+}
+* { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.hero-section {
+    background: var(--gradient);
+    color: white;
+    padding: 6rem 0;
+    margin-bottom: 4rem;
+    position: relative;
+    overflow: visible;
+    border-radius: 0 0 50% 10% / 0 0 20% 80%;
+    box-shadow: inset 0 -20px 40px rgba(0,0,0,0.1);
+    animation: heroEnter 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+}
+@keyframes heroEnter { 
+    0% { opacity: 0; transform: translateY(-40px) scale(0.95); } 
+    100% { opacity: 1; transform: translateY(0) scale(1); } 
+}
+.hero-section::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: rgba(212, 165, 116, 0.3);
+    border-radius: var(--asymmetric-radius);
+    top: -50px;
+    right: -50px;
+    animation: morph 8s ease-in-out infinite alternate;
+    z-index: 0;
+}
+.hero-section .container { position: relative; z-index: 1; text-align: left; animation: fadeInRight 1.5s ease backwards 0.3s; }
+@keyframes fadeInRight {
+    0% { opacity: 0; transform: translateX(-30px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes morph {
+    0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: rotate(0deg); }
+    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(10deg); }
+}
+.hero-section h1 { font-size: 4rem; font-weight: 800; text-shadow: 2px 4px 10px rgba(0,0,0,0.3); margin-bottom: 20px;}
+.produto-card { animation: popIn 0.8s ease backwards; transition: all 0.5s; }
+.produto-card:nth-child(odd) { transform-origin: top left; }
+.produto-card:nth-child(even) { transform-origin: bottom right; }
+.produto-card:nth-child(1) { animation-delay: 0.1s; }
+.produto-card:nth-child(2) { animation-delay: 0.2s; }
+.produto-card:nth-child(3) { animation-delay: 0.3s; }
+.produto-card:nth-child(4) { animation-delay: 0.4s; }
+.produto-card:nth-child(5) { animation-delay: 0.5s; }
+.produto-card:nth-child(6) { animation-delay: 0.6s; }
+@keyframes popIn {
+    0% { opacity: 0; transform: translate3d(0, 50px, 0) scale(0.9) rotate(-3deg); }
+    100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+}
+.produto-card .card { 
+    border: none; 
+    border-radius: 20px 50px 20px 20px; 
+    overflow: hidden; 
+    box-shadow: -5px 10px 25px rgba(0,0,0,0.08); 
+    background: #fffafa;
+}
+.produto-card .card:hover { 
+    transform: translateY(-10px) rotate(1deg) scale(1.02); 
+    box-shadow: -10px 20px 40px rgba(0,0,0,0.15); 
+    border-radius: 50px 20px 50px 20px;
+}
+.produto-card .card-img-top { height: 200px; object-fit: cover; clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%); transition: 0.5s; }
+.produto-card .card:hover .card-img-top { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 90%); transform: scale(1.08); }
+.produto-card .card-body { display: flex; flex-direction: column; height: 100%; }
+.produto-card .card-title { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 28px; }
+.produto-card .card-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 48px; flex-grow: 1; }
+.produto-card .precio { font-size: 1.4rem; font-weight: 900; color: var(--secondary); }
+.quantity-control { display: flex; align-items: center; gap: 8px; }
+.qty-btn { width: 35px; height: 35px; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; border: 2px solid var(--secondary); background: white; color: var(--secondary); font-weight: 700; align-items:center; justify-content:center; display:flex; }
+.qty-btn.qty-plus { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+.qty-btn:hover { background: var(--secondary); color: white; transform: scale(1.15) rotate(10deg); box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3); }
+.qty-btn:active { transform: scale(0.9); }
+.qty-input { width: 45px; text-align: center; border: 2px dashed #dee2e6; border-radius: 12px; font-weight: bold; background: #fff8f0; transition: border-color 0.3s; }
+.qty-input:focus { border-color: var(--secondary); outline: none; }
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 10px rgba(212,165,116,0.3), 4px 8px 25px rgba(139, 69, 19, 0.3); transform: scale(1); }
+    50% { box-shadow: 0 0 30px rgba(212,165,116,0.8), 4px 8px 30px rgba(139, 69, 19, 0.5); transform: scale(1.03); }
+    100% { box-shadow: 0 0 10px rgba(212,165,116,0.3), 4px 8px 25px rgba(139, 69, 19, 0.3); transform: scale(1); }
+}
+.btn-cart-fixed { position: fixed; bottom: 30px; right: 30px; background: var(--gradient); color: white; border: none; border-radius: 30px 10px 30px 10px; padding: 18px 30px; font-size: 1.2rem; font-weight: 800; z-index: 1000; display: flex; align-items: center; gap: 10px; animation: pulseGlow 3s infinite; }
+.btn-cart-fixed:hover { transform: scale(1.1) rotate(-3deg) !important; animation: none; border-radius: 10px 30px 10px 30px; box-shadow: 5px 15px 35px rgba(139, 69, 19, 0.6); }
+.btn-outline-dark { border-radius: 20px 5px 20px 5px; font-weight: 700; border-width: 2px; position: relative; overflow: hidden; z-index: 1;}
+.btn-outline-dark::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 100%; background: #212529; border-radius: 50%; z-index: -1; transition: all 0.4s ease-out; transform: translate(-50%, -50%); opacity: 0; }
+.btn-outline-dark:hover::before, .btn-outline-dark.active::before { width: 120%; height: 300%; opacity: 1; border-radius: 5px; }
+.btn-outline-dark:hover, .btn-outline-dark.active { border-radius: 5px 20px 5px 20px; transform: translateY(-3px); color: #fff; border-color: #212529;}
+.btn-primary { background: var(--accent); border: none; color: #fff; border-radius: 10px 25px 10px 25px; font-weight: bold; padding: 10px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;}
+.btn-primary::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transform: skewX(-20deg); transition: 0.5s; }
+.btn-primary:hover::after { left: 150%; }
+.btn-primary:hover { background: var(--secondary); transform: translateY(-5px) scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+.category-section { animation: fadeIn 1s ease backwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+<div class="hero-section">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div style="max-width: 60%;">
+            <h1><i class="bi bi-ufo" style="display:inline-block; animation: morph 3s infinite alternate; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));"></i> {{ config.nombre_negocio }}</h1>
+            <p class="lead" style="font-size: 1.5rem; opacity: 0.9;">Explora los sabores rebeldes de nuestra galaxia.</p>
+        </div>
+        <div class="d-none d-md-flex justify-content-center align-items-center" style="width: 250px; height: 250px; background: rgba(255,255,255,0.15); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation: morph 5s linear infinite; box-shadow: 10px 10px 30px rgba(0,0,0,0.2);">
+            <i class="bi bi-stars" style="font-size: 5rem; color: #fff;"></i>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="text-center mb-5">
+        <div class="btn-group flex-wrap justify-content-center" role="group" style="gap: 15px; background: transparent;">
+            <button class="btn btn-outline-dark active" onclick="filtrar('todos', this)" style="border-radius: 20px 5px 20px 5px !important;">Todos</button>
+            {% for cat in categorias %}
+            <button class="btn btn-outline-dark" onclick="filtrar('{{ cat.nombre }}', this)" style="border-radius: 20px 5px 20px 5px !important;">
+                <i class="bi {{ cat.icono }}"></i> {{ cat.nombre|capitalize }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="menuGrid">
+        {% for cat in categorias %}
+        {% set items = productos|selectattr("categoria", "equalto", cat.nombre)|list %}
+        {% if items %}
+        <div class="category-section mb-5" data-section-cat="{{ cat.nombre }}">
+            <h2 class="mb-4" style="color: var(--secondary); font-weight: 900; position: relative; display: inline-block;">
+                <i class="bi {{ cat.icono }}"></i> {{ cat.nombre|capitalize }}
+                <span style="display: block; width: 60%; height: 5px; background: var(--accent); border-radius: 5px 20px 5px 20px; position: absolute; bottom: -8px; left: 0;"></span>
+            </h2>
+            <div class="row">
+                {% for item in items %}
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 produto-card">
+                    <div class="card h-100">
+                        {% if item.imagen %}
+                        <img src="{{ item.imagen }}" class="card-img-top" alt="{{ item.nombre }}" onerror="this.style.display='none'">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge mb-2 align-self-start" style="background: var(--accent); color: #fff; border-radius: 10px 5px 10px 5px;">{{ item.categoria }}</span>
+                            <h5 class="card-title" style="color:#2c1810; font-weight: 800;" title="{{ item.nombre }}">{{ item.nombre }}</h5>
+                            <p class="card-text text-muted small" title="{{ item.descripcion }}">{{ item.descripcion }}</p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                                    <span class="precio">${{ item.precio|int }}</span>
+                                    <div class="quantity-control">
+                                        <button class="qty-btn qty-minus" onclick="cambiarCant({{ item.id }}, -1)"><i class="bi bi-dash"></i></button>
+                                        <input type="number" class="qty-input" id="cant-{{ item.id }}" value="1" min="1" max="10" readonly>
+                                        <button class="qty-btn qty-plus" onclick="cambiarCant({{ item.id }}, 1)"><i class="bi bi-plus"></i></button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-100" onclick="agregar(this)" data-id="{{ item.id }}" data-nombre="{{ item.nombre }}" data-precio="{{ item.precio }}">
+                                    <i class="bi bi-cart-plus"></i> Agregar al Pedido
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<div class="offcanvas offcanvas-end" id="carritoCanvas">
+    <div class="offcanvas-header bg-dark text-white">
+        <h5 class="offcanvas-title"><i class="bi bi-cart"></i> Tu Pedido</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="itemsCarrito"></div>
+        <hr>
+        <div class="d-flex justify-content-between mb-3">
+            <strong>Total:</strong>
+            <strong class="text-success fs-4" id="totalCarrito">$0</strong>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tu nombre <span class="text-danger">(obligatorio)</span></label>
+            <input type="text" class="form-control" id="nombreCliente" placeholder="Tu nombre">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Teléfono <span class="text-muted">(opcional)</span></label>
+            <input type="tel" class="form-control" id="telefonoCliente" placeholder="300 123 4567">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Dirección de entrega</label>
+            <input type="text" class="form-control" id="direccionCliente" placeholder="Calle, barrio">
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="domicilioCheck" onchange="toggleDomicilio()">
+            <label class="form-check-label" for="domicilioCheck">🛵 pido a domicilio (+${{ '{:,}'.format(config.costo_domicilio if config.costo_domicilio else 3000)|replace(',', '.') }})</label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Notas</label>
+            <textarea class="form-control" id="notasCliente" rows="2" placeholder="Sin cebolla, etc."></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Forma de pago</label>
+            <select class="form-select" id="formaPago">
+                <option value="transferencia">📱 Transferencia</option>
+                <option value="tarjeta">💳 Tarjeta</option>
+            </select>
+        </div>
+        <button class="btn btn-success w-100 btn-lg" onclick="hacerPedido()">
+            <i class="bi bi-whatsapp"></i> Enviar por WhatsApp
+        </button>
+    </div>
+</div>
+<button class="btn-cart-fixed" onclick="mostrarCarrito()">
+    <i class="bi bi-cart"></i> <span id="cantCarrito">0</span> - $<span id="totalCarritoBtn">0</span>
+</button>
+{% endblock %}
+{% block scripts %}
+<script>
+let carrito = [];
+const COSTO_DOMICILIO = {{ config.costo_domicilio if config.costo_domicilio else 3000 }};
+let conDomicilio = false;
+
+function cambiarCant(id, delta) {
+    const input = document.getElementById('cant-' + id);
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 10) val = 10;
+    input.value = val;
+}
+function agregar(btn) {
+    const id = parseInt(btn.dataset.id);
+    const nombre = btn.dataset.nombre;
+    const precio = parseFloat(btn.dataset.precio);
+    const cant = parseInt(document.getElementById('cant-' + id).value);
+    const existing = carrito.find(item => item.id === id);
+    if (existing) existing.cantidad += cant;
+    else carrito.push({id, nombre, precio, cantidad: cant});
+    actualizarCarrito();
+    mostrarToast('Agregado al carrito', 'success');
+}
+function actualizarCarrito() {
+    let total = 0;
+    document.getElementById('cantCarrito').textContent = carrito.reduce((a, b) => a + b.cantidad, 0);
+    const container = document.getElementById('itemsCarrito');
+    if (carrito.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-5">Carrito vacío</p>';
+    } else {
+        container.innerHTML = '';
+        carrito.forEach((item, index) => {
+            total += item.precio * item.cantidad;
+            container.innerHTML += '<div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded"><div><strong>' + item.nombre + '</strong><br><small>$' + item.precio.toLocaleString() + ' x ' + item.cantidad + '</small></div><div class="d-flex align-items-center"><strong>$' + (item.precio * item.cantidad).toLocaleString() + '</strong><button class="btn btn-sm btn-outline-danger ms-2" onclick="eliminar(' + index + ')"><i class="bi bi-trash"></i></button></div></div>';
+        });
+        if (conDomicilio) {
+            total += COSTO_DOMICILIO;
+            container.innerHTML += '<div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-warning rounded"><div><strong>🚀 Domicilio</strong></div><div class="d-flex align-items-center"><strong>$' + COSTO_DOMICILIO.toLocaleString() + '</strong></div></div>';
+        }
+    }
+    document.getElementById('totalCarrito').textContent = '$' + total.toLocaleString();
+    document.getElementById('totalCarritoBtn').textContent = total.toLocaleString();
+}
+function eliminar(index) { carrito.splice(index, 1); actualizarCarrito(); }
+function mostrarCarrito() { bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('carritoCanvas')).show(); }
+function toggleDomicilio() { conDomicilio = document.getElementById('domicilioCheck').checked; actualizarCarrito(); }
+
+function hacerPedido() {
+    if (carrito.length === 0) return mostrarToast('Carrito vacío', 'error');
+    const nombre = document.getElementById('nombreCliente').value.trim();
+    if (!nombre) return mostrarToast('⚠️ Ingresa tu nombre', 'error');
+    
+    const telefono = window.OVNI_WHATSAPP_PHONE || '';
+    if (!telefono) return mostrarToast('Error de configuración', 'error');
+    
+    let mensaje = `*¡Hola! Quiero hacer un pedido:*\n\n`;
+    mensaje += `*Cliente:* ${nombre}\n`;
+    if (document.getElementById('telefonoCliente').value) mensaje += `*Teléfono:* ${document.getElementById('telefonoCliente').value}\n`;
+    if (document.getElementById('direccionCliente').value) mensaje += `*Dirección:* ${document.getElementById('direccionCliente').value}\n`;
+    mensaje += `\n*Pedido:*\n`;
+    
+    let total = 0;
+    let subtotalDomicilio = conDomicilio ? COSTO_DOMICILIO : 0;
+    carrito.forEach(item => {
+        const subtotal = item.precio * item.cantidad;
+        total += subtotal;
+        mensaje += `• ${item.nombre} x${item.cantidad} = $${subtotal.toLocaleString()}\n`;
+    });
+    total += subtotalDomicilio;
+    if (conDomicilio) mensaje += `\n*🚀 Domicilio:* $${COSTO_DOMICILIO.toLocaleString()}\n`;
+    mensaje += `\n*Total: $${total.toLocaleString()}*\n`;
+    const formaPagoEl = document.getElementById('formaPago');
+    mensaje += `\n*Forma de pago:* ${formaPagoEl.options[formaPagoEl.selectedIndex].text}`;
+    if (document.getElementById('notasCliente').value) mensaje += `\n\n*Notas:* ${document.getElementById('notasCliente').value}`;
+    
+    window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    
+    setTimeout(() => {
+        carrito = [];
+        conDomicilio = false;
+        if (document.getElementById('domicilioCheck')) document.getElementById('domicilioCheck').checked = false;
+        actualizarCarrito();
+        bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('carritoCanvas')).hide();
+        document.getElementById('nombreCliente').value = '';
+        document.getElementById('telefonoCliente').value = '';
+        document.getElementById('direccionCliente').value = '';
+        document.getElementById('notasCliente').value = '';
+    }, 1000);
+}
+
+function filtrar(cat, btn) {
+    document.querySelectorAll('.category-section').forEach(el => {
+        el.style.display = (cat === 'todos' || el.dataset.sectionCat === cat) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+function mostrarToast(msg, tipo) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + tipo;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+}
+</script>
+{% endblock %}

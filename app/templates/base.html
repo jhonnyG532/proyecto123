@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ config.nombre_negocio }}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root { --primary: #2c1810; --secondary: #8b4513; --accent: #d4a574; --gradient: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        * { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        body { font-family: 'Nunito', sans-serif; background-color: #fffdfa; }
+        .navbar { background: var(--gradient) !important; box-shadow: 0 10px 30px rgba(44, 24, 16, 0.2); padding: 20px 0; border-radius: 0 0 20px 50px; margin-bottom: 10px;}
+        .navbar-brand { font-weight: 900; font-size: 1.8rem; letter-spacing: 1px; color: #fff !important; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        .navbar-brand:hover { transform: scale(1.05) rotate(-2deg); text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+        .nav-link { font-weight: 700; border-radius: 20px 5px 20px 5px; padding: 8px 20px !important; margin: 0 5px; border: 2px solid transparent; color: #fff !important; position: relative; overflow: hidden; z-index: 1;}
+        .nav-link::before { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 100%; background: rgba(255,255,255,0.15); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; border-radius: 20px 5px 20px 5px; }
+        .nav-link:hover::before { width: 100%; border-radius: 5px 20px 5px 20px;}
+        .nav-link:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); border-radius: 5px 20px 5px 20px; }
+        footer { background: var(--gradient); color: white; padding: 60px 0 30px; margin-top: 80px; border-radius: 50% 10% 0 0 / 20% 40% 0 0; position: relative; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.15);}
+        footer::before { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; bottom: -50px; left: -50px; animation: footermorph 6s linear infinite; }
+        @keyframes footermorph { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        footer h5 { font-weight: 800; margin-bottom: 25px; position: relative; display: inline-block; z-index: 1;}
+        footer h5::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60%; height: 4px; background: var(--accent); border-radius: 4px 0 4px 0; }
+        .footer-content { position: relative; z-index: 1; }
+        .social-links { display: flex; gap: 15px; margin-top: 20px; }
+        .social-btn { display: inline-flex; width: 50px; height: 50px; border-radius: 40% 60% 60% 40% / 50% 50% 50% 50%; color: white !important; background: rgba(255,255,255,0.12); border: 2px solid var(--accent); align-items: center; justify-content: center; font-size: 1.4rem; text-decoration: none; }
+        .social-btn:hover { background: var(--accent); color: var(--primary) !important; transform: translateY(-5px) rotate(8deg); box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-radius: 60% 40% 40% 60% / 50% 50% 50% 50%;}
+        #toast-container { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 12px; z-index: 9999; }
+        .toast { padding: 18px 30px; border-radius: 20px 5px 20px 5px; color: white; font-weight: 800; opacity: 0; transform: translateY(40px) scale(0.8) rotate(-2deg); transition: all 0.5s; box-shadow: 0 15px 35px rgba(0,0,0,0.3); min-width: 260px; border: none; }
+        .toast-success { background: linear-gradient(135deg, #28a745, #20c997); }
+        .toast-error { background: linear-gradient(135deg, #dc3545, #c82333); }
+        .toast.show { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-ufo"></i> {{ config.nombre_negocio }}</a>
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Menú</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sugerencias">Sugerencias</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block content %}{% endblock %}
+    <footer>
+        <div class="container footer-content">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5><i class="bi bi-ufo"></i> {{ config.nombre_negocio }}</h5>
+                    <p>El mejor sabor de la galaxia.</p>
+                    <div class="social-links">
+                        {% if whatsapp_url_open %}
+                        <a href="{{ whatsapp_url_open }}" target="_blank" class="social-btn whatsapp" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        {% endif %}
+                        {% if instagram_url %}
+                        <a href="{{ instagram_url }}" target="_blank" class="social-btn instagram" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Contacto</h5>
+                    <p><i class="bi bi-geo-alt-fill"></i> {{ config.direccion }}</p>
+                    <p><i class="bi bi-telephone-fill"></i> {{ config.telefono }}</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Horarios</h5>
+                    <p>Lun - Vie: 7AM - 9PM</p>
+                    <p>Sáb - Dom: 8AM - 10PM</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <p class="text-center mb-0">{{ config.mensaje_pie }} ♥</p>
+        </div>
+    </footer>
+    <div id="toast-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.OVNI_WHATSAPP_PHONE = {{ whatsapp_digits|tojson }};</script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
