@@ -25,10 +25,10 @@
     
     <div class="container my-4">
         <ul class="nav nav-tabs mb-3">
-            <li class="nav-item"><a class="nav-link active" href="#" onclick="showTab('productos')">Productos</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('categorias')">Categorías</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('config')">Configuración</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('imagenes')">Imágenes</a></li>
+            <li class="nav-item"><a class="nav-link active" href="#" data-tab="productos">Productos</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-tab="categorias">Categorías</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-tab="config">Configuración</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-tab="imagenes">Imágenes</a></li>
         </ul>
         
         <!-- PRODUCTOS -->
@@ -69,11 +69,9 @@
                                 <option value="false">Inactivo</option>
                             </select>
                         </div>
-                        <div class="col-md-2 mb-2 d-flex align-items-end">
-                            <button class="btn btn-success w-100" onclick="saveProduct()">💾 Guardar</button>
-                        </div>
-                        <div class="col-md-2 mb-2 d-flex align-items-end">
-                            <button class="btn btn-primary w-100" onclick="clearProduct()">➕ Nuevo</button>
+                        <div class="col-md-4 mb-2 d-flex align-items-end">
+                            <button class="btn btn-success me-2" onclick="saveProduct()">💾 Guardar</button>
+                            <button class="btn btn-primary" onclick="newProduct()">➕ Nuevo</button>
                         </div>
                     </div>
                 </div>
@@ -82,7 +80,7 @@
                 <div class="card-header">Lista de Productos</div>
                 <div class="card-body p-0">
                     <table class="table table-hover mb-0" id="productsTable">
-                        <thead><tr><th>Nombre</th><th>Precio</th><th>Catégorie</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -166,12 +164,14 @@
             <div class="card mb-3">
                 <div class="card-header bg-success text-white">Subir Imagen</div>
                 <div class="card-body">
-                    <form id="uploadForm" class="row">
-                        <div class="col-md-8">
-                            <input type="file" class="form-control" id="fileInput" accept="image/*">
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-success w-100">⬆️ Subir</button>
+                    <form id="uploadForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="file" class="form-control" id="fileInput" accept="image/*">
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-success w-100">⬆️ Subir Imagen</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -189,19 +189,26 @@
     <script>
     var token = localStorage.getItem('token');
     if (!token) { window.location.href = '/panel-galaxia-2026'; }
-    else { console.log('Token OK'); }
     
     function logout() { localStorage.removeItem('token'); window.location.href = '/panel-galaxia-2026'; }
     
+    // Tabs
+    document.querySelectorAll('.nav-tabs .nav-link').forEach(function(btn) {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            showTab(this.dataset.tab);
+        };
+    });
+    
     function showTab(tab) {
+        document.querySelectorAll('.nav-tabs .nav-link').forEach(function(el) { el.classList.remove('active'); });
+        document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+        
         document.getElementById('tab-productos').style.display = tab === 'productos' ? 'block' : 'none';
         document.getElementById('tab-categorias').style.display = tab === 'categorias' ? 'block' : 'none';
         document.getElementById('tab-config').style.display = tab === 'config' ? 'block' : 'none';
         document.getElementById('tab-imagenes').style.display = tab === 'imagenes' ? 'block' : 'none';
-        document.querySelectorAll('.nav-tabs .nav-link').forEach(function(el) {
-            el.classList.remove('active');
-            if (el.textContent.toLowerCase() === tab || (tab === 'productos' && el.textContent === 'Productos')) el.classList.add('active');
-        });
+        
         if (tab === 'productos') loadProducts();
         else if (tab === 'categorias') loadCategorias();
         else if (tab === 'config') loadConfig();
@@ -257,7 +264,7 @@
         }
     }
     
-    function clearProduct() {
+    function newProduct() {
         document.getElementById('prodId').value = '';
         document.getElementById('prodNombre').value = '';
         document.getElementById('prodPrecio').value = '';
@@ -271,7 +278,11 @@
     function saveProduct() {
         var nombre = document.getElementById('prodNombre').value.trim();
         var precio = parseInt(document.getElementById('prodPrecio').value) || 0;
-        if (!nombre || !precio) { alert('Nombre y precio son requeridos'); return; }
+        
+        if (!nombre || !precio) {
+            alert('Nombre y precio son requeridos');
+            return;
+        }
         
         var id = document.getElementById('prodId').value;
         var payload = {
@@ -293,13 +304,12 @@
             body: JSON.stringify(payload)
         })
         .then(function(res) { 
-            console.log('Save product response:', res.status); 
             if (res.ok || res.status === 201) {
                 alert('✅ Guardado!');
-                clearProduct();
+                newProduct();
                 loadProducts();
             } else {
-                res.text().then(function(t) { alert('Error: ' + t); console.log('Error:', t); });
+                alert('Error: ' + res.status);
             }
         });
     }
@@ -405,7 +415,7 @@
                 html += '<div class="card">';
                 html += '<img src="' + img.url + '" class="card-img-top" style="height:150px;object-fit:cover;">';
                 html += '<div class="card-body p-2 text-center">';
-                html += '<button class="btn btn-sm btn-primary me-1" onclick="copyUrl(\'' + img.url + '\')">📋 Copiar URL</button>';
+                html += '<button class="btn btn-sm btn-primary me-1" onclick="copyUrl(\'' + img.url + '\')">📋</button>';
                 html += '<button class="btn btn-sm btn-danger" onclick="deleteImage(\'' + img.name + '\')">🗑️</button>';
                 html += '</div></div></div>';
             });
@@ -414,7 +424,8 @@
     }
     
     function copyUrl(url) {
-        navigator.clipboard.writeText(window.location.origin + url).then(function() {
+        var fullUrl = window.location.origin + url;
+        navigator.clipboard.writeText(fullUrl).then(function() {
             alert('URL copiada!');
         });
     }
