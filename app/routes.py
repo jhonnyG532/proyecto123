@@ -313,7 +313,19 @@ def create_categoria():
     db.session.commit()
     return jsonify({"message": "Categoría creada"}), 201
 
-@main_bp.route('/api/categorias/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+@main_bp.route('/api/categorias/<int:id>', methods=['GET'])
+def get_categoria(id):
+    """Obtener una categoría"""
+    categoria = Categoria.query.get_or_404(id)
+    return jsonify({
+        'id': categoria.id,
+        'nombre': categoria.nombre,
+        'icono': categoria.icono,
+        'orden': categoria.orden,
+        'activa': categoria.activa
+    })
+
+@main_bp.route('/api/categorias/<int:id>', methods=['PUT', 'PATCH', 'DELETE'])
 @jwt_required()
 def update_categoria(id):
     """Gestionar categoría (admin)"""
