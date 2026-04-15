@@ -110,9 +110,7 @@ def admin_dashboard():
 @main_bp.route('/api/sugerencias', methods=['POST'])
 def enviar_sugerencia():
     """Enviar sugerencia (público)"""
-    ip = get_client_ip()
-    if not check_api_rate(ip, 'sugerencias', limit=10, window=60):
-        return jsonify({"error": "Demasiadas solicitudes"}), 429
+    # Skip rate limiting for suggestions to avoid blocking
     
     data = request.get_json(silent=True)
     if not data:
