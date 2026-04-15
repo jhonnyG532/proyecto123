@@ -185,8 +185,15 @@ def get_productos():
         if not nombre or len(nombre) < 2:
             return jsonify({"error": "Nombre requerido"}), 400
         
+        # Generar código único si no se proporciona o está duplicado
+        codigo = sanitize_html(data.get('codigo', '')) or None
+        if codigo:
+            existente = Producto.query.filter_by(codigo=codigo).first()
+            if existente:
+                codigo = None  # Ignorar código duplicado
+        
         producto = Producto(
-            codigo=sanitize_html(data.get('codigo', '')),
+            codigo=codigo,
             nombre=nombre[:100],
             descripcion=sanitize_html(data.get('descripcion', ''))[:500],
             precio=max(data.get('precio', 0), 0),

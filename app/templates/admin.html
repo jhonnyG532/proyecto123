@@ -218,32 +218,46 @@
     
     // PRODUCTOS
     let editingProductId = null;
-    document.getElementById('productForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const payload = {
-            codigo: document.getElementById('prodCodigo').value,
-            nombre: document.getElementById('prodNombre').value,
-            precio: parseInt(document.getElementById('prodPrecio').value) || 0,
-            categoria: document.getElementById('prodCategoria').value,
-            descripcion: document.getElementById('prodDescripcion').value,
-            imagen: document.getElementById('prodImagen').value,
-            stock: parseInt(document.getElementById('prodStock').value) || 0,
-            disponible: document.getElementById('prodDisponible').value === 'true'
-        };
-        const method = editingProductId ? 'PUT' : 'POST';
-        const url = editingProductId ? '/api/productos/'+editingProductId : '/api/productos';
-        const res = await fetch(url, {
-            method: method,
-            headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
-            body: JSON.stringify(payload)
+    var productForm = document.getElementById('productForm');
+    if(productForm){
+        productForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            var nombre = document.getElementById('prodNombre').value;
+            var precio = parseInt(document.getElementById('prodPrecio').value) || 0;
+            if(!nombre || precio <= 0){
+                alert('Nombre y precio requeridos');
+                return false;
+            }
+            var payload = {
+                nombre: nombre,
+                precio: precio,
+                categoria: document.getElementById('prodCategoria').value,
+                descripcion: document.getElementById('prodDescripcion').value,
+                stock: parseInt(document.getElementById('prodStock').value) || 100,
+                disponible: document.getElementById('prodDisponible').value === 'true'
+            };
+            var method = editingProductId ? 'PUT' : 'POST';
+            var url = editingProductId ? '/api/productos/'+editingProductId : '/api/productos';
+            var xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4){
+                    if(xhr.status === 200 || xhr.status === 201){
+                        alert('Producto guardado');
+                        productForm.reset();
+                        editingProductId = null;
+                        loadProducts();
+                    }else{
+                        alert('Error: ' + xhr.status);
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(payload));
+            return false;
         });
-        if(res.ok){
-            show('Producto guardado');
-            document.getElementById('productForm').reset();
-            editingProductId = null;
-            loadProducts();
-        }
-    };
+    }
     
     async function editProducto(id) {
         const res = await fetch('/api/productos/'+id, {headers:{'Authorization':'Bearer '+token}});
