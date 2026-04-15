@@ -129,7 +129,7 @@ def enviar_sugerencia():
         correo=sanitize_html(data.get('correo', '')[:100]),
         tipo=data.get('tipo', 'sugerencia'),
         mensaje=mensaje,
-        rating=min(max(data.get('rating', 5), 1), 5)
+        rating=int(data.get('rating', 5) or 5)
     )
     db.session.add(sugerencia)
     db.session.commit()

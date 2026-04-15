@@ -95,19 +95,10 @@
 {% endblock %}
 {% block scripts %}
 <script>
-function mostrarToast(msg, tipo) {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-' + tipo;
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
-}
 document.getElementById('formSugerencia').onsubmit = async (e) => {
     e.preventDefault();
     const mensaje = document.getElementById('sugMensaje').value.trim();
-    if (!mensaje) return mostrarToast('⚠️ Escribe tu mensaje', 'error');
+    if (!mensaje) return alert('Escribe tu mensaje');
     const tipo = document.querySelector('input[name="tipo"]:checked').value;
     const rating = document.querySelector('input[name="rating"]:checked').value;
     try {
@@ -123,13 +114,13 @@ document.getElementById('formSugerencia').onsubmit = async (e) => {
             })
         });
         const data = await res.json();
-        if (data.mensaje) {
-            mostrarToast('✅ ' + data.mensaje, 'success');
+        if (data.message || data.mensaje) {
+            alert('✅ ¡Gracias! Tu opinión es importante.');
             e.target.reset();
             document.getElementById('star5').checked = true;
         }
-    } catch (e) {
-        mostrarToast('❌ Error al enviar', 'error');
+    } catch (err) {
+        alert('❌ Error al enviar');
     }
 };
 </script>
