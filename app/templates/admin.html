@@ -9,8 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Nunito', sans-serif; background: #fffdfa; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-        .btn { border-radius: 10px; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -41,11 +40,11 @@
                     <div class="row">
                         <div class="col-md-4 mb-2">
                             <label>Nombre *</label>
-                            <input type="text" class="form-control" id="prodNombre" placeholder="Nombre">
+                            <input type="text" class="form-control" id="prodNombre">
                         </div>
                         <div class="col-md-2 mb-2">
                             <label>Precio *</label>
-                            <input type="number" class="form-control" id="prodPrecio" placeholder="0">
+                            <input type="number" class="form-control" id="prodPrecio">
                         </div>
                         <div class="col-md-3 mb-2">
                             <label>Categoría</label>
@@ -53,7 +52,7 @@
                         </div>
                         <div class="col-md-3 mb-2">
                             <label>Imagen</label>
-                            <input type="text" class="form-control" id="prodImg" placeholder="URL o seleccionar">
+                            <input type="text" class="form-control" id="prodImg">
                             <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="openGallery()">📁 Galeria</button>
                         </div>
                         <div class="col-12 mb-2">
@@ -74,7 +73,59 @@
                         <div class="col-md-4 mb-2 d-flex align-items-end">
                             <button class="btn btn-success me-2" onclick="saveProduct()">💾 Guardar</button>
                             <button type="button" class="btn btn-primary" id="btnNuevo">➕ Nuevo</button>
-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Productos Existentes</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0" id="prodTable">
+                        <thead><tr><th>Nombre</th><th>Precio</th><th>Cat</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CATEGORIAS -->
+        <div id="tab-categorias" style="display:none;">
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">Nueva Categoría</div>
+                <div class="card-body">
+                    <input type="hidden" id="catId">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label>Nombre *</label>
+                            <input type="text" class="form-control" id="catNom">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label>Icono</label>
+                            <select class="form-control" id="catIcon">
+                                <option value="bi-ufo">🚀 Ovni</option>
+                                <option value="bi-burger">🍔 Hamburguesa</option>
+                                <option value="bi-hot">🌭 Hotdog</option>
+                                <option value="bi-french-fries">🍟 Papa</option>
+                                <option value="bi-cup-straw">🥤 Bebida</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label>Orden</label>
+                            <input type="number" class="form-control" id="catOrd" value="0">
+                        </div>
+                        <div class="col-md-2 mb-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="saveCat()">💾 Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Categorías</div>
+                <div class="card-body p-0">
+                    <table class="table mb-0" id="catTable">
+                        <thead><tr><th>Nombre</th><th>Icono</th><th>Orden</th><th>Acciones</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -150,7 +201,9 @@
     
     function logout() { localStorage.clear(); window.location.href = '/panel-galaxia-2026'; }
     
-    // Botón Nuevo - agregar producto
+    var galleryModal = new bootstrap.Modal(document.getElementById('galleryModal'));
+    
+    // Botón Nuevo
     document.getElementById('btnNuevo').onclick = function() {
         document.getElementById('prodId').value = '';
         document.getElementById('prodNombre').value = '';
@@ -161,8 +214,6 @@
         document.getElementById('prodStock').value = '100';
         document.getElementById('prodDisp').value = 'true';
     };
-    
-    var galleryModal = new bootstrap.Modal(document.getElementById('galleryModal'));
     
     function showTab(tab) {
         document.querySelectorAll('.nav-tabs .nav-link').forEach(function(el) {
@@ -228,17 +279,6 @@
         }
     }
     
-    function newProduct() {
-        document.getElementById('prodId').value = '';
-        document.getElementById('prodNombre').value = '';
-        document.getElementById('prodPrecio').value = '';
-        document.getElementById('prodCat').value = '';
-        document.getElementById('prodDesc').value = '';
-        document.getElementById('prodImg').value = '';
-        document.getElementById('prodStock').value = '100';
-        document.getElementById('prodDisp').value = 'true';
-    }
-    
     function saveProduct() {
         var nom = document.getElementById('prodNombre').value.trim();
         var pre = parseInt(document.getElementById('prodPrecio').value) || 0;
@@ -266,7 +306,7 @@
         .then(function(r) {
             if (r.ok || r.status === 201) {
                 alert('✅ Guardado!');
-                newProduct();
+                document.getElementById('btnNuevo').onclick();
                 loadProducts();
             } else {
                 alert('Error: ' + r.status);
@@ -384,6 +424,27 @@
         });
     }
     
+    // SUGERENCIAS
+    function loadSugerencias() {
+        fetch('/api/sugerencias', { headers: { 'Authorization': 'Bearer ' + tk } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var h = '';
+            data.forEach(function(s) {
+                var fecha = s.created_at ? new Date(s.created_at).toLocaleDateString() : '-';
+                h += '<tr><td>' + (s.nombre || 'Anónimo') + '</td><td>' + s.tipo + '</td><td>' + (s.mensaje || '').substring(0,50) + '</td><td>' + fecha + '</td><td><button class="btn btn-sm btn-danger" onclick="delSug(' + s.id + ')">🗑️</button></td></tr>';
+            });
+            document.querySelector('#sugTable tbody').innerHTML = h || 'No hay sugerencias';
+        });
+    }
+    
+    function delSug(id) {
+        if (confirm('¿Eliminar?')) {
+            fetch('/api/sugerencias/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + tk } })
+            .then(function() { loadSugerencias(); });
+        }
+    }
+    
     // CONFIG
     function loadCfg() {
         fetch('/api/configuracion')
@@ -410,27 +471,6 @@
         .then(function(r) {
             if (r.ok) alert('✅ Guardado!');
         });
-    }
-    
-    // SUGERENCIAS
-    function loadSugerencias() {
-        fetch('/api/sugerencias', { headers: { 'Authorization': 'Bearer ' + tk } })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            var h = '';
-            data.forEach(function(s) {
-                var fecha = s.created_at ? new Date(s.created_at).toLocaleDateString() : '-';
-                h += '<tr><td>' + (s.nombre || 'Anónimo') + '</td><td>' + s.tipo + '</td><td>' + (s.mensaje || '').substring(0,50) + '</td><td>' + fecha + '</td><td><button class="btn btn-sm btn-danger" onclick="delSug(' + s.id + ')">🗑️</button></td></tr>';
-            });
-            document.querySelector('#sugTable tbody').innerHTML = h || 'No hay sugerencias';
-        });
-    }
-    
-    function delSug(id) {
-        if (confirm('¿Eliminar?')) {
-            fetch('/api/sugerencias/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + tk } })
-            .then(function() { loadSugerencias(); });
-        }
     }
     
     // INIT
