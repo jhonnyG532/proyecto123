@@ -207,7 +207,7 @@ def get_productos():
         'disponible': p.disponible
     } for p in productos])
 
-@main_bp.route('/api/productos/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@main_bp.route('/api/productos/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 @jwt_required()
 def producto_detalle(id):
     """Gestionar producto individual (admin)"""
@@ -218,10 +218,10 @@ def producto_detalle(id):
         db.session.commit()
         return jsonify({"message": "Producto eliminado"})
     
-    if request.method == 'PUT':
+    if request.method in ['PUT', 'PATCH']:
         data = request.get_json(silent=True)
         if data:
-            for key in ['nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'disponible']:
+            for key in ['codigo', 'nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'disponible']:
                 if key in data:
                     setattr(producto, key, data[key])
             db.session.commit()
@@ -230,7 +230,13 @@ def producto_detalle(id):
     return jsonify({
         'id': producto.id, 
         'codigo': producto.codigo, 
-        'nombre': producto.nombre
+        'nombre': producto.nombre,
+        'descripcion': producto.descripcion,
+        'precio': producto.precio,
+        'categoria': producto.categoria,
+        'imagen': producto.imagen,
+        'stock': producto.stock,
+        'disponible': producto.disponible
     })
 
 # ============= API CONFIGURACIÓN =============
@@ -299,7 +305,7 @@ def create_categoria():
     db.session.commit()
     return jsonify({"message": "Categoría creada"}), 201
 
-@main_bp.route('/api/categorias/<int:id>', methods=['PUT', 'DELETE'])
+@main_bp.route('/api/categorias/<int:id>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 @jwt_required()
 def update_categoria(id):
     """Gestionar categoría (admin)"""
@@ -309,6 +315,15 @@ def update_categoria(id):
         db.session.delete(categoria)
         db.session.commit()
         return jsonify({"message": "Categoría eliminada"})
+    
+    if request.method in ['GET']:
+        return jsonify({
+            'id': categoria.id,
+            'nombre': categoria.nombre,
+            'icono': categoria.icono,
+            'orden': categoria.orden,
+            'activa': categoria.activa
+        })
     
     data = request.get_json(silent=True)
     if data:
