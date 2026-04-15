@@ -38,6 +38,7 @@
             <li class="nav-item"><button class="nav-link" onclick="showTab('categorias', this)">Categorías</button></li>
             <li class="nav-item"><button class="nav-link" onclick="showTab('sugerencias', this)">Sugerencias</button></li>
             <li class="nav-item"><button class="nav-link" onclick="showTab('config', this)">Configuración</button></li>
+            <li class="nav-item"><button class="nav-link" onclick="showTab('usuarios', this)">Usuarios</button></li>
         </ul>
         
         <div id="tab-productos">
@@ -135,6 +136,26 @@
                 </div>
             </div>
         </div>
+        
+        <div id="tab-usuarios" style="display:none;">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="bi bi-person-plus"></i> Nuevo Usuario</h5></div>
+                <div class="card-body">
+                    <form id="usuarioForm" class="row g-3">
+                        <div class="col-md-4"><label class="form-label">Usuario *</label><input type="text" class="form-control" id="usrUsername" required></div>
+                        <div class="col-md-4"><label class="form-label">Contraseña *</label><input type="password" class="form-control" id="usrPassword" required></div>
+                        <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg"></i> Crear</button></div>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">Usuarios Existentes</h5></div>
+                <div class="card-body">
+                    <table class="table"><thead><tr><th>Usuario</th><th>Rol</th><th>Fecha</th><th>Acciones</th></tr></thead>
+                    <tbody id="usuariosTable"></tbody></table>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -144,13 +165,14 @@
     function logout() { localStorage.clear(); window.location.href = '/panel-galaxia-2026'; }
     function show(msg, type='info') { alert(msg); }
     function showTab(tab, el) {
-        ['productos', 'categorias', 'sugerencias', 'config'].forEach(t => document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none');
+        ['productos', 'categorias', 'sugerencias', 'config', 'usuarios'].forEach(t => document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none');
         document.querySelectorAll('.nav-pills .nav-link').forEach(b => b.classList.remove('active'));
         if (el) el.classList.add('active');
-        if (tab === 'productos') loadProducts();
+        if (tab === 'productos') { loadProducts(); loadCategoriasSelect([]); }
         if (tab === 'categorias') loadCategorias();
         if (tab === 'sugerencias') loadSugerencias();
         if (tab === 'config') loadConfig();
+        if (tab === 'usuarios') loadUsuarios();
     }
     
     async function loadProducts() {
@@ -175,11 +197,11 @@
     }
     
     async function loadCategoriasSelect(categorias) {
-        const res = await fetch('/api/categorias?all=1');
+        const res = await fetch('/api/categorias');
         let opts = '<option value="">Seleccionar...</option>';
         if(res.ok){
             const data = await res.json();
-            data.forEach(c => { if(c.activa) opts += '<option value="'+c.nombre+'">'+c.nombre+'</option>'; });
+            data.forEach(c => { opts += '<option value="'+c.nombre+'">'+c.nombre+'</option>'; });
         }
         document.getElementById('prodCategoria').innerHTML = opts;
     }
@@ -340,6 +362,44 @@
         });
         if(res.ok) show('Configuración guardada');
     };
+    
+    // USUARIOS
+    document.getElementById('usuarioForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await fetch('/api/auth/register', {
+            method:'POST',
+            headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+            body: JSON.stringify({
+                username: document.getElementById('usrUsername').value,
+                password: document.getElementById('usrPassword').value
+            })
+        });
+        if(res.ok){
+            show('Usuario creado');
+            document.getElementById('usuarioForm').reset();
+            loadUsuarios();
+        }else{
+            const data = await res.json();
+            show(data.error || 'Error al crear usuario');
+        }
+    };
+    
+    async function loadUsuarios() {
+        const res = await fetch('/api/usuarios', {headers:{'Authorization':'Bearer '+token}});
+        if(res.ok){
+            const data = await res.json();
+            document.getElementById('usuariosTable').innerHTML = data.map(u => 
+                '<tr><td><strong>'+u.username+'</strong></td><td><span class="badge bg-primary">'+u.rol+'</span></td><td>'+(u.created_at ? new Date(u.created_at).toLocaleDateString() : '-')+'</td><td>'+(u.username !== 'jhonny' ? '<button class="btn btn-sm btn-danger py-0 px-2" onclick="delUsuario('+u.id+')"><i class="bi bi-trash"></i></button>' : '-')+'</td></tr>'
+            ).join('');
+        }
+    }
+    
+    async function delUsuario(id) {
+        if(confirm('¿Eliminar usuario?')){
+            await fetch('/api/usuarios/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
+            loadUsuarios();
+        }
+    }
     
     loadProducts();
     </script>
