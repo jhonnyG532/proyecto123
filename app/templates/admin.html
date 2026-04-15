@@ -231,28 +231,28 @@
     }
     
     // PRODUCTOS
+    var cachedProducts = null;
+    var cachedCategories = null;
+    
     function loadProducts() {
-        fetch('/api/productos', { headers: { 'Authorization': 'Bearer ' + tk } })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
+        Promise.all([
+            fetch('/api/productos', { headers: { 'Authorization': 'Bearer ' + tk } }).then(function(r){ return r.json(); }),
+            fetch('/api/categorias').then(function(r){ return r.json(); })
+        ])
+        .then(function(results) {
+            cachedProducts = results[0];
+            cachedCategories = results[1];
+            
+            // Build products table
             var h = '';
-            data.forEach(function(p) {
-                h += '<tr>';
-                h += '<td><strong>' + p.nombre + '</strong></td>';
-                h += '<td>$' + p.precio.toLocaleString() + '</td>';
-                h += '<td>' + (p.categoria || '-') + '</td>';
-                h += '<td>' + p.stock + '</td>';
-                h += '<td>' + (p.disponible ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-secondary">Inactivo</span>') + '</td>';
-                h += '<td><button class="btn btn-sm btn-warning" onclick="editP(' + p.id + ')">✏️</button> <button class="btn btn-sm btn-danger" onclick="delP(' + p.id + ')">🗑️</button></td>';
-                h += '</tr>';
+            cachedProducts.forEach(function(p) {
+                h += '<tr><td><strong>' + p.nombre + '</strong></td><td>$' + p.precio.toLocaleString() + '</td><td>' + (p.categoria || '-') + '</td><td>' + p.stock + '</td><td>' + (p.disponible ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-secondary">Inactivo</span>') + '</td><td><button class="btn btn-sm btn-warning" onclick="editP(' + p.id + ')">✏️</button> <button class="btn btn-sm btn-danger" onclick="delP(' + p.id + ')">🗑️</button></td></tr>';
             });
             document.querySelector('#prodTable tbody').innerHTML = h;
-        });
-        fetch('/api/categorias')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
+            
+            // Build category dropdown
             var o = '<option value="">Seleccionar...</option>';
-            data.forEach(function(c) { o += '<option value="' + c.nombre + '">' + c.nombre + '</option>'; });
+            cachedCategories.forEach(function(c) { o += '<option value="' + c.nombre + '">' + c.nombre + '</option>'; });
             document.getElementById('prodCat').innerHTML = o;
         });
     }
@@ -306,7 +306,14 @@
         .then(function(r) {
             if (r.ok || r.status === 201) {
                 alert('✅ Guardado!');
-                document.getElementById('btnNuevo').onclick();
+                document.getElementById('prodId').value = '';
+                document.getElementById('prodNombre').value = '';
+                document.getElementById('prodPrecio').value = '';
+                document.getElementById('prodCat').value = '';
+                document.getElementById('prodDesc').value = '';
+                document.getElementById('prodImg').value = '';
+                document.getElementById('prodStock').value = '100';
+                document.getElementById('prodDisp').value = 'true';
                 loadProducts();
             } else {
                 alert('Error: ' + r.status);
