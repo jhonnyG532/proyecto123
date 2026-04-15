@@ -28,6 +28,7 @@
             <li class="nav-item"><a class="nav-link active" href="#" onclick="showTab('productos')">Productos</a></li>
             <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('categorias')">Categorías</a></li>
             <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('config')">Configuración</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('imagenes')">Imágenes</a></li>
         </ul>
         
         <!-- PRODUCTOS -->
@@ -159,6 +160,29 @@
                 </div>
             </div>
         </div>
+        
+        <!-- IMAGENES -->
+        <div id="tab-imagenes" style="display:none;">
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">Subir Imagen</div>
+                <div class="card-body">
+                    <form id="uploadForm" class="row">
+                        <div class="col-md-8">
+                            <input type="file" class="form-control" id="fileInput" accept="image/*">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success w-100">⬆️ Subir</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Imágenes Guardadas</div>
+                <div class="card-body">
+                    <div class="row" id="imagesGrid"></div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -173,6 +197,7 @@
         document.getElementById('tab-productos').style.display = tab === 'productos' ? 'block' : 'none';
         document.getElementById('tab-categorias').style.display = tab === 'categorias' ? 'block' : 'none';
         document.getElementById('tab-config').style.display = tab === 'config' ? 'block' : 'none';
+        document.getElementById('tab-imagenes').style.display = tab === 'imagenes' ? 'block' : 'none';
         document.querySelectorAll('.nav-tabs .nav-link').forEach(function(el) {
             el.classList.remove('active');
             if (el.textContent.toLowerCase() === tab || (tab === 'productos' && el.textContent === 'Productos')) el.classList.add('active');
@@ -180,6 +205,7 @@
         if (tab === 'productos') loadProducts();
         else if (tab === 'categorias') loadCategorias();
         else if (tab === 'config') loadConfig();
+        else if (tab === 'imagenes') loadImages();
     }
     
     // PRODUCTOS
@@ -367,6 +393,60 @@
             if (res.ok) alert('✅ Guardado!');
         });
     }
+    
+    // IMAGENES
+    function loadImages() {
+        fetch('/api/images', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function(res) { return res.json(); })
+        .then(function(imgs) {
+            var html = '';
+            imgs.forEach(function(img) {
+                html += '<div class="col-md-3 mb-3">';
+                html += '<div class="card">';
+                html += '<img src="' + img.url + '" class="card-img-top" style="height:150px;object-fit:cover;">';
+                html += '<div class="card-body p-2 text-center">';
+                html += '<button class="btn btn-sm btn-primary me-1" onclick="copyUrl(\'' + img.url + '\')">📋 Copiar URL</button>';
+                html += '<button class="btn btn-sm btn-danger" onclick="deleteImage(\'' + img.name + '\')">🗑️</button>';
+                html += '</div></div></div>';
+            });
+            document.getElementById('imagesGrid').innerHTML = html || '<p class="text-muted">No hay imágenes</p>';
+        });
+    }
+    
+    function copyUrl(url) {
+        navigator.clipboard.writeText(window.location.origin + url).then(function() {
+            alert('URL copiada!');
+        });
+    }
+    
+    function deleteImage(name) {
+        if (confirm('¿Eliminar imagen?')) {
+            fetch('/api/images/' + name, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } })
+            .then(function() { loadImages(); });
+        }
+    }
+    
+    document.getElementById('uploadForm').onsubmit = function(e) {
+        e.preventDefault();
+        var fileInput = document.getElementById('fileInput');
+        if (!fileInput.files[0]) { alert('Selecciona un archivo'); return; }
+        
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        
+        fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: formData
+        })
+        .then(function(res) { 
+            if (res.ok) {
+                alert('✅ Imagen subida!');
+                fileInput.value = '';
+                loadImages();
+            }
+        });
+    };
     
     // Init
     loadProducts();
