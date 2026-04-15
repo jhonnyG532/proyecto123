@@ -37,24 +37,34 @@
         <!-- PRODUCTOS TAB -->
         <div id="tab-productos">
             <div class="card mb-4">
-                <div class="card-header bg-success text-white"><h5 class="mb-0">Nuevo Producto</h5></div>
+                <div class="card-header bg-success text-white"><h5 class="mb-0" id="productFormTitle">Nuevo Producto</h5></div>
                 <div class="card-body">
                     <form id="productForm">
+                        <input type="hidden" id="prodId">
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="prodNombre" required></div>
+                            <div class="col-md-4"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="prodNombre" required></div>
                             <div class="col-md-3"><label class="form-label">Precio *</label><input type="number" class="form-control" id="prodPrecio" min="0" required></div>
                             <div class="col-md-3"><label class="form-label">Categoría</label><select class="form-select" id="prodCategoria"></select></div>
+                            <div class="col-md-2"><label class="form-label">Código</label><input type="text" class="form-control" id="prodCodigo"></div>
                             <div class="col-12"><label class="form-label">Descripción</label><textarea class="form-control" id="prodDescripcion" rows="2"></textarea></div>
-                            <div class="col-md-6"><label class="form-label">Imagen URL</label><input type="url" class="form-control" id="prodImagen" placeholder="https://..."></div>
+                            <div class="col-md-5"><label class="form-label">Imagen</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="prodImagen" placeholder="URL o selecciona...">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="openImageManager()">📁</button>
+                                </div>
+                            </div>
                             <div class="col-md-2"><label class="form-label">Stock</label><input type="number" class="form-control" id="prodStock" value="100"></div>
                             <div class="col-md-2"><label class="form-label">Estado</label><select class="form-select" id="prodDisponible"><option value="true">Activo</option><option value="false">Inactivo</option></select></div>
-                            <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100">Guardar</button></div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success me-2">Guardar</button>
+                                <button type="button" class="btn btn-secondary" onclick="newProduct()">Nuevo</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header">Productos</div>
+                <div class="card-header">Productos Existentes</div>
                 <div class="card-body">
                     <div id="productsList"></div>
                 </div>
@@ -67,6 +77,7 @@
                 <div class="card-header bg-success text-white">Nueva Categoría</div>
                 <div class="card-body">
                     <form id="categoriaForm">
+                        <input type="hidden" id="catId">
                         <div class="row g-3">
                             <div class="col-md-4"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="catNombre" required></div>
                             <div class="col-md-4"><label class="form-label">Icono</label><select class="form-select" id="catIcono">
@@ -75,6 +86,11 @@
                                 <option value="bi-hot">🌭 Hotdog</option>
                                 <option value="bi-french-fries">🍟 Papa</option>
                                 <option value="bi-cup-straw">🥤 Bebida</option>
+                                <option value="bi-egg-fried">🍳 Desayuno</option>
+                                <option value="bi-pizza">🍕 Pizza</option>
+                                <option value="bi-cup">☕ Café</option>
+                                <option value="bi-ice-cream">🍦 Postre</option>
+                                <option value="bi-star">⭐ Favorito</option>
                             </select></div>
                             <div class="col-md-2"><label class="form-label">Orden</label><input type="number" class="form-control" id="catOrden" value="0"></div>
                             <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100">Guardar</button></div>
@@ -83,7 +99,7 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-header">Categorías</div>
+                <div class="card-header">Categorías Existentes</div>
                 <div class="card-body">
                     <div id="categoriasList"></div>
                 </div>
@@ -93,17 +109,40 @@
         <!-- CONFIG TAB -->
         <div id="tab-config" style="display:none;">
             <div class="card">
-                <div class="card-header">Configuración</div>
+                <div class="card-header">Configuración del Negocio</div>
                 <div class="card-body">
                     <form id="configForm">
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" class="form-control" id="cfgNombre"></div>
+                            <div class="col-md-6"><label class="form-label">Nombre del Negocio</label><input type="text" class="form-control" id="cfgNombre"></div>
                             <div class="col-md-6"><label class="form-label">Teléfono</label><input type="text" class="form-control" id="cfgTel"></div>
                             <div class="col-md-6"><label class="form-label">Dirección</label><input type="text" class="form-control" id="cfgDir"></div>
-                            <div class="col-md-6"><label class="form-label">Instagram</label><input type="text" class="form-control" id="cfgInstagram"></div>
-                            <div class="col-12"><button type="submit" class="btn btn-primary">Guardar</button></div>
+                            <div class="col-md-6"><label class="form-label">Instagram</label><input type="text" class="form-control" id="cfgInstagram" placeholder="@burger.ovni"></div>
+                            <div class="col-md-6"><label class="form-label">NIT</label><input type="text" class="form-control" id="cfgNit"></div>
+                            <div class="col-12"><label class="form-label">Mensaje Pie</label><input type="text" class="form-control" id="cfgMsg"></div>
+                            <div class="col-12"><button type="submit" class="btn btn-primary">Guardar Configuración</button></div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Manager Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestor de Imágenes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm" class="mb-3">
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="fileInput" accept="image/*">
+                            <button class="btn btn-primary" type="submit">Subir</button>
+                        </div>
+                    </form>
+                    <div class="row g-2" id="imagesList"></div>
                 </div>
             </div>
         </div>
@@ -136,9 +175,9 @@
         fetch('/api/productos', {headers:{'Authorization':'Bearer '+token}})
         .then(function(r){ return r.json(); })
         .then(function(data){
-            var html = '<table class="table"><thead><tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Estado</th><th></th></tr></thead><tbody>';
+            var html = '<table class="table table-hover"><thead><tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
             data.forEach(function(p){
-                html += '<tr><td>'+(p.nombre||'')+'</td><td>$'+(p.precio||0).toLocaleString()+'</td><td>'+(p.categoria||'')+'</td><td>'+(p.disponible?'<span class="badge bg-success">Activo</span>':'<span class="badge bg-secondary">Inactivo</span>')+'</td><td><button class="btn btn-sm btn-danger" onclick="delProducto('+p.id+')">X</button></td></tr>';
+                html += '<tr><td><strong>'+(p.nombre||'')+'</strong><br><small class="text-muted">'+(p.descripcion||'').substring(0,40)+'</small></td><td>$'+(p.precio||0).toLocaleString()+'</td><td>'+(p.categoria||'-')+'</td><td>'+p.stock+'</td><td>'+(p.disponible?'<span class="badge bg-success">Activo</span>':'<span class="badge bg-secondary">Inactivo</span>')+'</td><td><button class="btn btn-sm btn-primary me-1" onclick="editProducto('+p.id+')">✏️</button><button class="btn btn-sm btn-danger" onclick="delProducto('+p.id+')">🗑️</button></td></tr>';
             });
             html += '</tbody></table>';
             document.getElementById('productsList').innerHTML = html;
@@ -156,8 +195,34 @@
         });
     }
     
+    function editProducto(id){
+        fetch('/api/productos/'+id, {headers:{'Authorization':'Bearer '+token}})
+        .then(function(r){ return r.json(); })
+        .then(function(p){
+            document.getElementById('prodId').value = id;
+            document.getElementById('prodCodigo').value = p.codigo || '';
+            document.getElementById('prodNombre').value = p.nombre || '';
+            document.getElementById('prodPrecio').value = p.precio || 0;
+            document.getElementById('prodCategoria').value = p.categoria || '';
+            document.getElementById('prodDescripcion').value = p.descripcion || '';
+            document.getElementById('prodImagen').value = p.imagen || '';
+            document.getElementById('prodStock').value = p.stock || 100;
+            document.getElementById('prodDisponible').value = p.disponible ? 'true' : 'false';
+            document.getElementById('productFormTitle').innerText = 'Editar Producto';
+            document.getElementById('prodNombre').focus();
+        });
+    }
+    
+    function newProduct(){
+        document.getElementById('productForm').reset();
+        document.getElementById('prodId').value = '';
+        document.getElementById('prodStock').value = 100;
+        document.getElementById('prodDisponible').value = 'true';
+        document.getElementById('productFormTitle').innerText = 'Nuevo Producto';
+    }
+    
     function delProducto(id){
-        if(confirm('Eliminar?')){
+        if(confirm('¿Eliminar producto?')){
             fetch('/api/productos/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}})
             .then(function(){ loadProducts(); });
         }
@@ -171,7 +236,9 @@
             alert('Nombre y precio requeridos');
             return;
         }
+        var id = document.getElementById('prodId').value;
         var payload = {
+            codigo: document.getElementById('prodCodigo').value,
             nombre: nombre,
             precio: precio,
             categoria: document.getElementById('prodCategoria').value,
@@ -180,17 +247,19 @@
             stock: parseInt(document.getElementById('prodStock').value) || 100,
             disponible: document.getElementById('prodDisponible').value === 'true'
         };
-        fetch('/api/productos', {
-            method:'POST',
+        var method = id ? 'PUT' : 'POST';
+        var url = id ? '/api/productos/'+id : '/api/productos';
+        fetch(url, {
+            method: method,
             headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+token},
             body: JSON.stringify(payload)
         }).then(function(r){
-            if(r.ok){
+            if(r.ok || r.status === 201){
                 alert('Guardado!');
-                document.getElementById('productForm').reset();
+                newProduct();
                 loadProducts();
             }else{
-                alert('Error: '+r.status);
+                r.json().then(function(d){ alert('Error: '+(d.error||r.status)); });
             }
         });
     };
@@ -200,17 +269,28 @@
         fetch('/api/categorias?all=1')
         .then(function(r){ return r.json(); })
         .then(function(data){
-            var html = '<table class="table"><thead><tr><th>Nombre</th><th>Icono</th><th>Orden</th><th></th></tr></thead><tbody>';
+            var html = '<table class="table table-hover"><thead><tr><th>Nombre</th><th>Icono</th><th>Orden</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
             data.forEach(function(c){
-                html += '<tr><td>'+c.nombre+'</td><td><i class="bi '+c.icono+'"></i></td><td>'+c.orden+'</td><td><button class="btn btn-sm btn-danger" onclick="delCategoria('+c.id+')">X</button></td></tr>';
+                html += '<tr><td><strong>'+c.nombre+'</strong></td><td><i class="bi '+c.icono+'"></i></td><td>'+c.orden+'</td><td>'+(c.activa?'<span class="badge bg-success">Activa</span>':'<span class="badge bg-secondary">Inactiva</span>')+'</td><td><button class="btn btn-sm btn-primary me-1" onclick="editCategoria('+c.id+')">✏️</button><button class="btn btn-sm btn-danger" onclick="delCategoria('+c.id+')">🗑️</button></td></tr>';
             });
             html += '</tbody></table>';
             document.getElementById('categoriasList').innerHTML = html;
         });
     }
     
+    function editCategoria(id){
+        fetch('/api/categorias/'+id, {headers:{'Authorization':'Bearer '+token}})
+        .then(function(r){ return r.json(); })
+        .then(function(c){
+            document.getElementById('catId').value = id;
+            document.getElementById('catNombre').value = c.nombre || '';
+            document.getElementById('catIcono').value = c.icono || 'bi-burger';
+            document.getElementById('catOrden').value = c.orden || 0;
+        });
+    }
+    
     function delCategoria(id){
-        if(confirm('Eliminar?')){
+        if(confirm('¿Eliminar categoría?')){
             fetch('/api/categorias/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}})
             .then(function(){ loadCategorias(); });
         }
@@ -218,19 +298,23 @@
     
     document.getElementById('categoriaForm').onsubmit = function(e){
         e.preventDefault();
+        var id = document.getElementById('catId').value;
         var payload = {
             nombre: document.getElementById('catNombre').value,
             icono: document.getElementById('catIcono').value,
             orden: parseInt(document.getElementById('catOrden').value) || 0
         };
-        fetch('/api/categorias', {
-            method:'POST',
+        var method = id ? 'PUT' : 'POST';
+        var url = id ? '/api/categorias/'+id : '/api/categorias';
+        fetch(url, {
+            method: method,
             headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+token},
             body: JSON.stringify(payload)
         }).then(function(r){
-            if(r.ok){
+            if(r.ok || r.status === 201){
                 alert('Guardado!');
                 document.getElementById('categoriaForm').reset();
+                document.getElementById('catId').value = '';
                 loadCategorias();
             }
         });
@@ -245,6 +329,8 @@
             document.getElementById('cfgTel').value = c.telefono || '';
             document.getElementById('cfgDir').value = c.direccion || '';
             document.getElementById('cfgInstagram').value = c.instagram || '';
+            document.getElementById('cfgNit').value = c.nit || '';
+            document.getElementById('cfgMsg').value = c.mensaje_pie || '';
         });
     }
     
@@ -257,10 +343,62 @@
                 nombre_negocio: document.getElementById('cfgNombre').value,
                 telefono: document.getElementById('cfgTel').value,
                 direccion: document.getElementById('cfgDir').value,
-                instagram: document.getElementById('cfgInstagram').value
+                instagram: document.getElementById('cfgInstagram').value,
+                nit: document.getElementById('cfgNit').value,
+                mensaje_pie: document.getElementById('cfgMsg').value
             })
         }).then(function(r){
-            if(r.ok) alert('Guardado!');
+            if(r.ok) alert('Configuración guardada!');
+        });
+    };
+    
+    // IMAGE MANAGER
+    var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    
+    function openImageManager(){
+        loadImages();
+        imageModal.show();
+    }
+    
+    function loadImages(){
+        fetch('/api/images', {headers:{'Authorization':'Bearer '+token}})
+        .then(function(r){ return r.json(); })
+        .then(function(imgs){
+            var html = '';
+            imgs.forEach(function(img){
+                html += '<div class="col-4"><div class="position-relative"><img src="'+img.url+'" class="img-thumbnail" style="height:80px;object-fit:cover;cursor:pointer;" onclick="selectImage(\''+img.url+'\')"><button class="btn btn-sm btn-danger position-absolute top-0 end-0" onclick="deleteImage(\''+img.name+'\')">×</button></div></div>';
+            });
+            document.getElementById('imagesList').innerHTML = html || '<p class="text-muted">No hay imágenes</p>';
+        });
+    }
+    
+    function selectImage(url){
+        document.getElementById('prodImagen').value = url;
+        imageModal.hide();
+    }
+    
+    function deleteImage(name){
+        if(confirm('¿Eliminar imagen?')){
+            fetch('/api/images/'+name, {method:'DELETE', headers:{'Authorization':'Bearer '+token}})
+            .then(function(){ loadImages(); });
+        }
+    }
+    
+    document.getElementById('uploadForm').onsubmit = function(e){
+        e.preventDefault();
+        var fileInput = document.getElementById('fileInput');
+        if(!fileInput.files[0]) return;
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        fetch('/api/upload', {
+            method:'POST',
+            headers:{'Authorization':'Bearer '+token},
+            body: formData
+        }).then(function(r){
+            if(r.ok){
+                loadImages();
+                fileInput.value = '';
+            }
         });
     };
     
