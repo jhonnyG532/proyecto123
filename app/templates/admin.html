@@ -9,20 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { background-color: #fffdfa; font-family: 'Nunito', sans-serif; }
-        .card { border: none; border-radius: 40px 10px 40px 10px; box-shadow: -5px 15px 35px rgba(0,0,0,0.08); background: #fffafa; overflow: hidden; transition: all 0.3s;}
-        .card:hover { transform: translateY(-5px); box-shadow: -10px 20px 40px rgba(0,0,0,0.12); border-radius: 10px 40px 10px 40px; }
-        .nav-pills .nav-link { border-radius: 20px 5px 20px 5px; font-weight: 700; color: #8b4513; margin: 0 5px; transition: all 0.3s;}
-        .nav-pills .nav-link.active { background-color: #d4a574; color: #2c1810; border-radius: 5px 20px 5px 20px; }
-        .navbar-brand { font-weight: 800; font-size: 1.5rem; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); transition: all 0.3s;}
-        .navbar-brand:hover { transform: scale(1.05) rotate(-2deg); }
-        .btn { border-radius: 15px 5px 15px 5px; font-weight: bold; transition: all 0.3s;}
-        .btn:hover { border-radius: 5px 15px 5px 15px; transform: scale(1.05); }
-        .form-control, .form-select { border-radius: 10px 5px 10px 5px; border: 2px solid #e0d5c8; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+        .btn { border-radius: 10px; font-weight: bold; }
+        .form-control, .form-select { border-radius: 10px; border: 2px solid #e0d5c8; }
         .form-control:focus, .form-select:focus { border-color: #d4a574; box-shadow: 0 0 0 0.2rem rgba(212,165,116,0.25); }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark" style="background: linear-gradient(135deg, #2c1810, #8b4513); border-radius: 0 0 20px 50px; padding: 20px 0; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(44, 24, 16, 0.2);">
+    <nav class="navbar navbar-dark" style="background: linear-gradient(135deg, #2c1810, #8b4513); padding: 15px 0;">
         <div class="container">
             <a class="navbar-brand" href="/"><i class="bi bi-ufo"></i> Admin</a>
             <div class="d-flex gap-2">
@@ -33,464 +27,245 @@
     </nav>
     <div class="container my-4">
         <h2 class="text-center mb-4">Panel Ovni Burger</h2>
-        <ul class="nav nav-pills justify-content-center mb-4">
-            <li class="nav-item"><button class="nav-link active" onclick="showTab('productos', this)">Productos</button></li>
-            <li class="nav-item"><button class="nav-link" onclick="showTab('categorias', this)">Categorías</button></li>
-            <li class="nav-item"><button class="nav-link" onclick="showTab('sugerencias', this)">Sugerencias</button></li>
-            <li class="nav-item"><button class="nav-link" onclick="showTab('config', this)">Configuración</button></li>
-            <li class="nav-item"><button class="nav-link" onclick="showTab('usuarios', this)">Usuarios</button></li>
+        
+        <ul class="nav nav-pills justify-content-center mb-4" id="mainTabs">
+            <li class="nav-item"><button class="nav-link active" data-tab="productos">Productos</button></li>
+            <li class="nav-item"><button class="nav-link" data-tab="categorias">Categorías</button></li>
+            <li class="nav-item"><button class="nav-link" data-tab="config">Configuración</button></li>
         </ul>
         
+        <!-- PRODUCTOS TAB -->
         <div id="tab-productos">
             <div class="card mb-4">
-                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Producto</h5></div>
+                <div class="card-header bg-success text-white"><h5 class="mb-0">Nuevo Producto</h5></div>
                 <div class="card-body">
-                    <form id="productForm" class="row g-3">
-                        <div class="col-md-2"><label class="form-label">Código</label><input type="text" class="form-control" id="prodCodigo" placeholder="HAM01"></div>
-                        <div class="col-md-4"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="prodNombre" required></div>
-                        <div class="col-md-3"><label class="form-label">Precio *</label><input type="number" class="form-control" id="prodPrecio" min="0" step="100" required></div>
-                        <div class="col-md-3"><label class="form-label">Categoría</label><select class="form-select" id="prodCategoria"><option value="">Seleccionar...</option></select></div>
-                        <div class="col-12"><label class="form-label">Descripción</label><textarea class="form-control" id="prodDescripcion" rows="2"></textarea></div>
-                        <div class="col-md-4"><label class="form-label">Imagen</label><div class="input-group"><input type="text" class="form-control" id="prodImagen" placeholder="Selecciona o URL"><button class="btn btn-outline-secondary" type="button" onclick="openImageManager()"><i class="bi bi-image"></i></button></div></div>
-                        <div class="col-md-2"><label class="form-label">Stock</label><input type="number" class="form-control" id="prodStock" value="100" min="0"></div>
-                        <div class="col-md-2"><label class="form-label">Estado</label><select class="form-select" id="prodDisponible"><option value="true">Activo</option><option value="false">Inactivo</option></select></div>
-                        <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg"></i> Guardar</button></div>
+                    <form id="productForm">
+                        <div class="row g-3">
+                            <div class="col-md-6"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="prodNombre" required></div>
+                            <div class="col-md-3"><label class="form-label">Precio *</label><input type="number" class="form-control" id="prodPrecio" min="0" required></div>
+                            <div class="col-md-3"><label class="form-label">Categoría</label><select class="form-select" id="prodCategoria"></select></div>
+                            <div class="col-12"><label class="form-label">Descripción</label><textarea class="form-control" id="prodDescripcion" rows="2"></textarea></div>
+                            <div class="col-md-6"><label class="form-label">Imagen URL</label><input type="url" class="form-control" id="prodImagen" placeholder="https://..."></div>
+                            <div class="col-md-2"><label class="form-label">Stock</label><input type="number" class="form-control" id="prodStock" value="100"></div>
+                            <div class="col-md-2"><label class="form-label">Estado</label><select class="form-select" id="prodDisponible"><option value="true">Activo</option><option value="false">Inactivo</option></select></div>
+                            <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100">Guardar</button></div>
+                        </div>
                     </form>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h5 class="mb-0">Productos Existentes</h5></div>
+                <div class="card-header">Productos</div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light"><tr><th>Código</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
-                            <tbody id="productsTable"></tbody>
-                        </table>
-                    </div>
+                    <div id="productsList"></div>
                 </div>
             </div>
         </div>
         
+        <!-- CATEGORÍAS TAB -->
         <div id="tab-categorias" style="display:none;">
             <div class="card mb-4">
-                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="bi bi-plus-circle"></i> Categoría</h5></div>
+                <div class="card-header bg-success text-white">Nueva Categoría</div>
                 <div class="card-body">
-                    <form id="categoriaForm" class="row g-3">
-                        <div class="col-md-4"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="catNombre" required></div>
-                        <div class="col-md-4"><label class="form-label">Icono</label>
-                            <select class="form-select" id="catIcono">
+                    <form id="categoriaForm">
+                        <div class="row g-3">
+                            <div class="col-md-4"><label class="form-label">Nombre *</label><input type="text" class="form-control" id="catNombre" required></div>
+                            <div class="col-md-4"><label class="form-label">Icono</label><select class="form-select" id="catIcono">
                                 <option value="bi-ufo">🚀 Ovni</option>
                                 <option value="bi-burger">🍔 Hamburguesa</option>
                                 <option value="bi-hot">🌭 Hotdog</option>
                                 <option value="bi-french-fries">🍟 Papa</option>
                                 <option value="bi-cup-straw">🥤 Bebida</option>
-                                <option value="bi-egg-fried">🍳 Desayuno</option>
-                                <option value="bi-pizza">🍕 Pizza</option>
-                                <option value="bi-cup">☕ Café</option>
-                                <option value="bi-ice-cream">🍦 Postre</option>
-                                <option value="bi-star">⭐ Estrella</option>
-                                <option value="bi-lightning">⚡ Especial</option>
-                                <option value="bi-joystick">🎮 Kids</option>
-                            </select>
+                            </select></div>
+                            <div class="col-md-2"><label class="form-label">Orden</label><input type="number" class="form-control" id="catOrden" value="0"></div>
+                            <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100">Guardar</button></div>
                         </div>
-                        <div class="col-md-2"><label class="form-label">Orden</label><input type="number" class="form-control" id="catOrden" value="0"></div>
-                        <div class="col-md-2"><label class="form-label">Estado</label><select class="form-select" id="catActiva"><option value="true">Activa</option><option value="false">Inactiva</option></select></div>
-                        <div class="col-12"><button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> Guardar Categoría</button> <button type="button" class="btn btn-secondary" onclick="nuevaCategoria()">Nueva</button></div>
                     </form>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h5 class="mb-0">Categorías Existentes</h5></div>
+                <div class="card-header">Categorías</div>
                 <div class="card-body">
-                    <table class="table"><thead><tr><th>Nombre</th><th>Icono</th><th>Orden</th><th>Estado</th><th>Acciones</th></tr></thead>
-                    <tbody id="categoriasTable"></tbody></table>
+                    <div id="categoriasList"></div>
                 </div>
             </div>
         </div>
         
-        <div id="tab-sugerencias" style="display:none;">
-            <div class="card">
-                <div class="card-header"><h5 class="mb-0">Sugerencias de Clientes</h5></div>
-                <div class="card-body">
-                    <table class="table"><thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Mensaje</th><th>Fecha</th><th>Acciones</th></tr></thead>
-                    <tbody id="sugerenciasTable"></tbody></table>
-                </div>
-            </div>
-        </div>
-        
+        <!-- CONFIG TAB -->
         <div id="tab-config" style="display:none;">
             <div class="card">
-                <div class="card-header"><h5 class="mb-0">Configuración del Negocio</h5></div>
+                <div class="card-header">Configuración</div>
                 <div class="card-body">
                     <form id="configForm">
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="form-label">Nombre del Negocio</label><input type="text" class="form-control" id="cfgNombre"></div>
+                            <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" class="form-control" id="cfgNombre"></div>
                             <div class="col-md-6"><label class="form-label">Teléfono</label><input type="text" class="form-control" id="cfgTel"></div>
                             <div class="col-md-6"><label class="form-label">Dirección</label><input type="text" class="form-control" id="cfgDir"></div>
-                            <div class="col-md-6"><label class="form-label">NIT</label><input type="text" class="form-control" id="cfgNit"></div>
-                            <div class="col-md-6"><label class="form-label">Instagram</label><input type="text" class="form-control" id="cfgInstagram" placeholder="@burger.ovni"></div>
-                            <div class="col-12"><label class="form-label">Mensaje Pie</label><input type="text" class="form-control" id="cfgMsg"></div>
-                            <div class="col-12"><button type="submit" class="btn btn-primary">Guardar Configuración</button></div>
+                            <div class="col-md-6"><label class="form-label">Instagram</label><input type="text" class="form-control" id="cfgInstagram"></div>
+                            <div class="col-12"><button type="submit" class="btn btn-primary">Guardar</button></div>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-        
-        <div id="tab-usuarios" style="display:none;">
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="bi bi-person-plus"></i> Nuevo Usuario</h5></div>
-                <div class="card-body">
-                    <form id="usuarioForm" class="row g-3">
-                        <div class="col-md-4"><label class="form-label">Usuario *</label><input type="text" class="form-control" id="usrUsername" required></div>
-                        <div class="col-md-4"><label class="form-label">Contraseña *</label><input type="password" class="form-control" id="usrPassword" required></div>
-                        <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg"></i> Crear</button></div>
-                    </form>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header"><h5 class="mb-0">Usuarios Existentes</h5></div>
-                <div class="card-body">
-                    <table class="table"><thead><tr><th>Usuario</th><th>Rol</th><th>Fecha</th><th>Acciones</th></tr></thead>
-                    <tbody id="usuariosTable"></tbody></table>
                 </div>
             </div>
         </div>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    const token = localStorage.getItem('token');
+    var token = localStorage.getItem('token');
     if (!token) window.location.href = '/panel-galaxia-2026';
     
     function logout() { localStorage.clear(); window.location.href = '/panel-galaxia-2026'; }
-    function show(msg, type='info') { alert(msg); }
-    function showTab(tab, el) {
-        ['productos', 'categorias', 'sugerencias', 'config', 'usuarios'].forEach(t => document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none');
-        document.querySelectorAll('.nav-pills .nav-link').forEach(b => b.classList.remove('active'));
-        if (el) el.classList.add('active');
-        if (tab === 'productos') { loadProducts(); loadCategoriasSelect([]); }
-        if (tab === 'categorias') loadCategorias();
-        if (tab === 'sugerencias') loadSugerencias();
-        if (tab === 'config') loadConfig();
-        if (tab === 'usuarios') loadUsuarios();
-    }
     
-    async function loadProducts() {
-        const res = await fetch('/api/productos', {headers:{'Authorization':'Bearer '+token}});
-        if(res.ok){
-            const data = await res.json();
-            document.getElementById('productsTable').innerHTML = data.map(p => 
-                '<tr><td>'+p.codigo+'</td><td><strong>'+p.nombre+'</strong><br><small class="text-muted">'+(p.descripcion||'').substring(0,50)+'</small></td><td>$'+p.precio.toLocaleString()+'</td><td><span class="badge bg-secondary">'+p.categoria+'</span></td><td>'+p.stock+'</td><td>'+(p.disponible ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-secondary">Inactivo</span>')+'</td><td><button class="btn btn-sm btn-primary me-1 py-0 px-2" onclick="editProducto('+p.id+')"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-danger py-0 px-2" onclick="delProducto('+p.id+')"><i class="bi bi-trash"></i></button></td></tr>'
-            ).join('');
-        }
-    }
-    
-    async function loadCategorias() {
-        const res = await fetch('/api/categorias?all=1');
-        if(res.ok){
-            const data = await res.json();
-            document.getElementById('categoriasTable').innerHTML = data.map(c => 
-                '<tr><td><strong>'+c.nombre+'</strong></td><td><i class="bi '+c.icono+'"></i> '+c.icono+'</td><td>'+c.orden+'</td><td>'+(c.activa ? '<span class="badge bg-success">Activa</span>' : '<span class="badge bg-secondary">Inactiva</span>')+'</td><td><button class="btn btn-sm btn-primary me-1 py-0 px-2" onclick="editCategoria('+c.id+')"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-danger py-0 px-2" onclick="delCategoria('+c.id+')"><i class="bi bi-trash"></i></button></td></tr>'
-            ).join('');
-            loadCategoriasSelect(data);
-        }
-    }
-    
-    async function loadCategoriasSelect(categorias) {
-        const res = await fetch('/api/categorias');
-        let opts = '<option value="">Seleccionar...</option>';
-        if(res.ok){
-            const data = await res.json();
-            data.forEach(c => { opts += '<option value="'+c.nombre+'">'+c.nombre+'</option>'; });
-        }
-        document.getElementById('prodCategoria').innerHTML = opts;
-    }
-    
-    async function loadSugerencias() {
-        const res = await fetch('/api/sugerencias', {headers:{'Authorization':'Bearer '+token}});
-        if(res.ok){
-            const data = await res.json();
-            document.getElementById('sugerenciasTable').innerHTML = data.map(s => 
-                '<tr><td>'+s.id+'</td><td>'+(s.nombre||'-')+'</td><td><span class="badge bg-info">'+s.tipo+'</span></td><td>'+(s.mensaje||'-').substring(0,50)+'</td><td>'+(s.created_at ? new Date(s.created_at).toLocaleDateString() : '-')+'</td><td><button class="btn btn-sm btn-danger py-0 px-2" onclick="delSugerencia('+s.id+')"><i class="bi bi-trash"></i></button></td></tr>'
-            ).join('');
-        }
-    }
+    // Tabs
+    document.querySelectorAll('#mainTabs .nav-link').forEach(function(btn){
+        btn.onclick = function(){
+            document.querySelectorAll('#mainTabs .nav-link').forEach(function(b){ b.classList.remove('active'); });
+            this.classList.add('active');
+            var tab = this.dataset.tab;
+            document.getElementById('tab-productos').style.display = tab === 'productos' ? 'block' : 'none';
+            document.getElementById('tab-categorias').style.display = tab === 'categorias' ? 'block' : 'none';
+            document.getElementById('tab-config').style.display = tab === 'config' ? 'block' : 'none';
+            if(tab === 'productos') loadProducts();
+            if(tab === 'categorias') loadCategorias();
+            if(tab === 'config') loadConfig();
+        };
+    });
     
     // PRODUCTOS
-    let editingProductId = null;
-    var productForm = document.getElementById('productForm');
-    if(productForm){
-        productForm.addEventListener('submit', function(e){
-            e.preventDefault();
-            var nombre = document.getElementById('prodNombre').value;
-            var precio = parseInt(document.getElementById('prodPrecio').value) || 0;
-            if(!nombre || precio <= 0){
-                alert('Nombre y precio requeridos');
-                return false;
-            }
-            var payload = {
-                nombre: nombre,
-                precio: precio,
-                categoria: document.getElementById('prodCategoria').value,
-                descripcion: document.getElementById('prodDescripcion').value,
-                stock: parseInt(document.getElementById('prodStock').value) || 100,
-                disponible: document.getElementById('prodDisponible').value === 'true'
-            };
-            var method = editingProductId ? 'PUT' : 'POST';
-            var url = editingProductId ? '/api/productos/'+editingProductId : '/api/productos';
-            var xhr = new XMLHttpRequest();
-            xhr.open(method, url, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-            xhr.onreadystatechange = function(){
-                if(xhr.readyState === 4){
-                    if(xhr.status === 200 || xhr.status === 201){
-                        alert('Producto guardado');
-                        productForm.reset();
-                        editingProductId = null;
-                        loadProducts();
-                    }else{
-                        alert('Error: ' + xhr.status);
-                    }
-                }
-            };
-            xhr.send(JSON.stringify(payload));
-            return false;
+    function loadProducts(){
+        fetch('/api/productos', {headers:{'Authorization':'Bearer '+token}})
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            var html = '<table class="table"><thead><tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Estado</th><th></th></tr></thead><tbody>';
+            data.forEach(function(p){
+                html += '<tr><td>'+(p.nombre||'')+'</td><td>$'+(p.precio||0).toLocaleString()+'</td><td>'+(p.categoria||'')+'</td><td>'+(p.disponible?'<span class="badge bg-success">Activo</span>':'<span class="badge bg-secondary">Inactivo</span>')+'</td><td><button class="btn btn-sm btn-danger" onclick="delProducto('+p.id+')">X</button></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('productsList').innerHTML = html;
+        });
+        loadCategoriasForSelect();
+    }
+    
+    function loadCategoriasForSelect(){
+        fetch('/api/categorias')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            var opts = '<option value="">Seleccionar...</option>';
+            data.forEach(function(c){ opts += '<option value="'+c.nombre+'">'+c.nombre+'</option>'; });
+            document.getElementById('prodCategoria').innerHTML = opts;
         });
     }
     
-    async function editProducto(id) {
-        const res = await fetch('/api/productos/'+id, {headers:{'Authorization':'Bearer '+token}});
-        if(res.ok){
-            const p = await res.json();
-            editingProductId = id;
-            document.getElementById('prodCodigo').value = p.codigo || '';
-            document.getElementById('prodNombre').value = p.nombre || '';
-            document.getElementById('prodPrecio').value = p.precio || 0;
-            document.getElementById('prodCategoria').value = p.categoria || '';
-            document.getElementById('prodDescripcion').value = p.descripcion || '';
-            document.getElementById('prodImagen').value = p.imagen || '';
-            document.getElementById('prodStock').value = p.stock || 0;
-            document.getElementById('prodDisponible').value = p.disponible ? 'true' : 'false';
+    function delProducto(id){
+        if(confirm('Eliminar?')){
+            fetch('/api/productos/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}})
+            .then(function(){ loadProducts(); });
         }
     }
     
-    async function delProducto(id) {
-        if(confirm('¿Eliminar producto?')){
-            await fetch('/api/productos/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
-            loadProducts();
-        }
-    }
-    
-    // CATEGORÍAS
-    let editingCatId = null;
-    document.getElementById('categoriaForm').onsubmit = async (e) => {
+    document.getElementById('productForm').onsubmit = function(e){
         e.preventDefault();
-        const payload = {
-            nombre: document.getElementById('catNombre').value,
-            icono: document.getElementById('catIcono').value || 'bi-burger',
-            orden: parseInt(document.getElementById('catOrden').value) || 0,
-            activa: document.getElementById('catActiva').value === 'true'
-        };
-        if(editingCatId){
-            await fetch('/api/categorias/'+editingCatId, {
-                method:'PUT',
-                headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
-                body: JSON.stringify(payload)
-            });
-        }else{
-            await fetch('/api/categorias', {
-                method:'POST',
-                headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
-                body: JSON.stringify(payload)
-            });
+        var nombre = document.getElementById('prodNombre').value;
+        var precio = parseInt(document.getElementById('prodPrecio').value) || 0;
+        if(!nombre || !precio){
+            alert('Nombre y precio requeridos');
+            return;
         }
-        show('Categoría guardada');
-        document.getElementById('categoriaForm').reset();
-        editingCatId = null;
-        document.getElementById('catOrden').value = 0;
-        loadCategorias();
+        var payload = {
+            nombre: nombre,
+            precio: precio,
+            categoria: document.getElementById('prodCategoria').value,
+            descripcion: document.getElementById('prodDescripcion').value,
+            imagen: document.getElementById('prodImagen').value,
+            stock: parseInt(document.getElementById('prodStock').value) || 100,
+            disponible: document.getElementById('prodDisponible').value === 'true'
+        };
+        fetch('/api/productos', {
+            method:'POST',
+            headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+            body: JSON.stringify(payload)
+        }).then(function(r){
+            if(r.ok){
+                alert('Guardado!');
+                document.getElementById('productForm').reset();
+                loadProducts();
+            }else{
+                alert('Error: '+r.status);
+            }
+        });
     };
     
-    async function editCategoria(id) {
-        const res = await fetch('/api/categorias/'+id, {headers:{'Authorization':'Bearer '+token}});
-        if(res.ok){
-            const c = await res.json();
-            editingCatId = id;
-            document.getElementById('catNombre').value = c.nombre || '';
-            document.getElementById('catIcono').value = c.icono || 'bi-burger';
-            document.getElementById('catOrden').value = c.orden || 0;
-            document.getElementById('catActiva').value = c.activa ? 'true' : 'false';
-            showTab('categorias');
+    // CATEGORÍAS
+    function loadCategorias(){
+        fetch('/api/categorias?all=1')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            var html = '<table class="table"><thead><tr><th>Nombre</th><th>Icono</th><th>Orden</th><th></th></tr></thead><tbody>';
+            data.forEach(function(c){
+                html += '<tr><td>'+c.nombre+'</td><td><i class="bi '+c.icono+'"></i></td><td>'+c.orden+'</td><td><button class="btn btn-sm btn-danger" onclick="delCategoria('+c.id+')">X</button></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('categoriasList').innerHTML = html;
+        });
+    }
+    
+    function delCategoria(id){
+        if(confirm('Eliminar?')){
+            fetch('/api/categorias/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}})
+            .then(function(){ loadCategorias(); });
         }
     }
     
-    function nuevaCategoria() {
-        editingCatId = null;
-        document.getElementById('categoriaForm').reset();
-        document.getElementById('catOrden').value = 0;
-    }
-    
-    async function delCategoria(id) {
-        if(confirm('¿Eliminar categoría?')){
-            await fetch('/api/categorias/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
-            loadCategorias();
-        }
-    }
-    
-    // SUGERENCIAS
-    async function delSugerencia(id) {
-        if(confirm('¿Eliminar sugerencia?')){
-            await fetch('/api/sugerencias/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
-            loadSugerencias();
-        }
-    }
+    document.getElementById('categoriaForm').onsubmit = function(e){
+        e.preventDefault();
+        var payload = {
+            nombre: document.getElementById('catNombre').value,
+            icono: document.getElementById('catIcono').value,
+            orden: parseInt(document.getElementById('catOrden').value) || 0
+        };
+        fetch('/api/categorias', {
+            method:'POST',
+            headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+            body: JSON.stringify(payload)
+        }).then(function(r){
+            if(r.ok){
+                alert('Guardado!');
+                document.getElementById('categoriaForm').reset();
+                loadCategorias();
+            }
+        });
+    };
     
     // CONFIG
-    async function loadConfig() {
-        const res = await fetch('/api/configuracion');
-        if(res.ok){
-            const c = await res.json();
+    function loadConfig(){
+        fetch('/api/configuracion')
+        .then(function(r){ return r.json(); })
+        .then(function(c){
             document.getElementById('cfgNombre').value = c.nombre_negocio || '';
             document.getElementById('cfgTel').value = c.telefono || '';
             document.getElementById('cfgDir').value = c.direccion || '';
             document.getElementById('cfgInstagram').value = c.instagram || '';
-            document.getElementById('cfgNit').value = c.nit || '';
-            document.getElementById('cfgMsg').value = c.mensaje_pie || '';
-        }
+        });
     }
     
-    document.getElementById('configForm').onsubmit = async (e) => {
+    document.getElementById('configForm').onsubmit = function(e){
         e.preventDefault();
-        const res = await fetch('/api/configuracion', {
+        fetch('/api/configuracion', {
             method:'PUT',
-            headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+            headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+token},
             body: JSON.stringify({
                 nombre_negocio: document.getElementById('cfgNombre').value,
-                direccion: document.getElementById('cfgDir').value,
                 telefono: document.getElementById('cfgTel').value,
-                nit: document.getElementById('cfgNit').value,
-                instagram: document.getElementById('cfgInstagram').value,
-                mensaje_pie: document.getElementById('cfgMsg').value
+                direccion: document.getElementById('cfgDir').value,
+                instagram: document.getElementById('cfgInstagram').value
             })
+        }).then(function(r){
+            if(r.ok) alert('Guardado!');
         });
-        if(res.ok) show('Configuración guardada');
     };
     
-    // USUARIOS
-    document.getElementById('usuarioForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const res = await fetch('/api/auth/register', {
-            method:'POST',
-            headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
-            body: JSON.stringify({
-                username: document.getElementById('usrUsername').value,
-                password: document.getElementById('usrPassword').value
-            })
-        });
-        if(res.ok){
-            show('Usuario creado');
-            document.getElementById('usuarioForm').reset();
-            loadUsuarios();
-        }else{
-            const data = await res.json();
-            show(data.error || 'Error al crear usuario');
-        }
-    };
-    
-    async function loadUsuarios() {
-        const res = await fetch('/api/usuarios', {headers:{'Authorization':'Bearer '+token}});
-        if(res.ok){
-            const data = await res.json();
-            document.getElementById('usuariosTable').innerHTML = data.map(u => 
-                '<tr><td><strong>'+u.username+'</strong></td><td><span class="badge bg-primary">'+u.rol+'</span></td><td>'+(u.created_at ? new Date(u.created_at).toLocaleDateString() : '-')+'</td><td>'+(u.username !== 'jhonny' ? '<button class="btn btn-sm btn-danger py-0 px-2" onclick="delUsuario('+u.id+')"><i class="bi bi-trash"></i></button>' : '-')+'</td></tr>'
-            ).join('');
-        }
-    }
-    
-    async function delUsuario(id) {
-        if(confirm('¿Eliminar usuario?')){
-            await fetch('/api/usuarios/'+id, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
-            loadUsuarios();
-        }
-    }
-    
+    // Init
     loadProducts();
-    </script>
-    
-    <!-- Image Manager Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Gestor de Imágenes</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="uploadForm" class="mb-3">
-                        <div class="input-group">
-                            <input type="file" class="form-control" id="fileInput" accept="image/*">
-                            <button class="btn btn-primary" type="submit"><i class="bi bi-upload"></i> Subir</button>
-                        </div>
-                    </form>
-                    <div class="row g-2" id="imagesList"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-    let imageModal = null;
-    document.addEventListener('DOMContentLoaded', function() {
-        imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-    });
-    
-    function openImageManager() {
-        loadImages();
-        imageModal.show();
-    }
-    
-    async function loadImages() {
-        const res = await fetch('/api/images', {headers:{'Authorization':'Bearer '+token}});
-        if(res.ok){
-            const images = await res.json();
-            document.getElementById('imagesList').innerHTML = images.map(img => 
-                '<div class="col-4 col-md-3"><div class="position-relative"><img src="'+img.url+'" class="img-thumbnail" style="height:80px;object-fit:cover;cursor:pointer;" onclick="selectImage(\''+img.url+'\')"><button class="btn btn-sm btn-danger position-absolute top-0 end-0 py-0 px-1" onclick="deleteImage(\''+img.name+'\')">&times;</button></div></div>'
-            ).join('') || '<p class="text-muted">No hay imágenes</p>';
-        }
-    }
-    
-    function selectImage(url) {
-        document.getElementById('prodImagen').value = url;
-        imageModal.hide();
-    }
-    
-    document.getElementById('uploadForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const fileInput = document.getElementById('fileInput');
-        if(!fileInput.files[0]) return;
-        
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-        
-        const res = await fetch('/api/upload', {
-            method: 'POST',
-            headers: {'Authorization': 'Bearer '+token},
-            body: formData
-        });
-        
-        if(res.ok){
-            loadImages();
-            fileInput.value = '';
-        }
-    };
-    
-    async function deleteImage(name) {
-        if(confirm('¿Eliminar imagen?')){
-            await fetch('/api/images/'+name, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
-            loadImages();
-        }
-    }
     </script>
 </body>
 </html>
