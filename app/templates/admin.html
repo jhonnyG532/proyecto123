@@ -50,7 +50,7 @@
                         <div class="col-md-3"><label class="form-label">Precio *</label><input type="number" class="form-control" id="prodPrecio" min="0" step="100" required></div>
                         <div class="col-md-3"><label class="form-label">Categoría</label><select class="form-select" id="prodCategoria"><option value="">Seleccionar...</option></select></div>
                         <div class="col-12"><label class="form-label">Descripción</label><textarea class="form-control" id="prodDescripcion" rows="2"></textarea></div>
-                        <div class="col-md-4"><label class="form-label">Imagen URL</label><input type="text" class="form-control" id="prodImagen" placeholder="https://..."></div>
+                        <div class="col-md-4"><label class="form-label">Imagen</label><div class="input-group"><input type="text" class="form-control" id="prodImagen" placeholder="Selecciona o URL"><button class="btn btn-outline-secondary" type="button" onclick="openImageManager()"><i class="bi bi-image"></i></button></div></div>
                         <div class="col-md-2"><label class="form-label">Stock</label><input type="number" class="form-control" id="prodStock" value="100" min="0"></div>
                         <div class="col-md-2"><label class="form-label">Estado</label><select class="form-select" id="prodDisponible"><option value="true">Activo</option><option value="false">Inactivo</option></select></div>
                         <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg"></i> Guardar</button></div>
@@ -158,9 +158,13 @@
         }
     }
     
-    function loadCategoriasSelect(categorias) {
+    async function loadCategoriasSelect(categorias) {
+        const res = await fetch('/api/categorias?all=1');
         let opts = '<option value="">Seleccionar...</option>';
-        categorias.forEach(c => { if(c.activa) opts += '<option value="'+c.nombre+'">'+c.nombre+'</option>'; });
+        if(res.ok){
+            const data = await res.json();
+            data.forEach(c => { if(c.activa) opts += '<option value="'+c.nombre+'">'+c.nombre+'</option>'; });
+        }
         document.getElementById('prodCategoria').innerHTML = opts;
     }
     
@@ -312,6 +316,81 @@
     };
     
     loadProducts();
+    </script>
+    
+    <!-- Image Manager Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestor de Imágenes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm" class="mb-3">
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="fileInput" accept="image/*">
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-upload"></i> Subir</button>
+                        </div>
+                    </form>
+                    <div class="row g-2" id="imagesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    let imageModal = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    });
+    
+    function openImageManager() {
+        loadImages();
+        imageModal.show();
+    }
+    
+    async function loadImages() {
+        const res = await fetch('/api/images', {headers:{'Authorization':'Bearer '+token}});
+        if(res.ok){
+            const images = await res.json();
+            document.getElementById('imagesList').innerHTML = images.map(img => 
+                '<div class="col-4 col-md-3"><div class="position-relative"><img src="'+img.url+'" class="img-thumbnail" style="height:80px;object-fit:cover;cursor:pointer;" onclick="selectImage(\''+img.url+'\')"><button class="btn btn-sm btn-danger position-absolute top-0 end-0 py-0 px-1" onclick="deleteImage(\''+img.name+'\')">&times;</button></div></div>'
+            ).join('') || '<p class="text-muted">No hay imágenes</p>';
+        }
+    }
+    
+    function selectImage(url) {
+        document.getElementById('prodImagen').value = url;
+        imageModal.hide();
+    }
+    
+    document.getElementById('uploadForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('fileInput');
+        if(!fileInput.files[0]) return;
+        
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: {'Authorization': 'Bearer '+token},
+            body: formData
+        });
+        
+        if(res.ok){
+            loadImages();
+            fileInput.value = '';
+        }
+    };
+    
+    async function deleteImage(name) {
+        if(confirm('¿Eliminar imagen?')){
+            await fetch('/api/images/'+name, {method:'DELETE', headers:{'Authorization':'Bearer '+token}});
+            loadImages();
+        }
+    }
     </script>
 </body>
 </html>

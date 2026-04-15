@@ -1,9 +1,12 @@
 import os
+import uuid
 from flask import Blueprint, render_template, jsonify, request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import db, Producto, Configuracion, Categoria, Sugerencia
-import time
-import re
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
 main_bp = Blueprint('main', __name__)
@@ -284,9 +287,13 @@ def update_config():
 
 @main_bp.route('/api/categorias', methods=['GET'])
 def get_categorias():
-    """Obtener categorías (público)"""
-    categorias = Categoria.query.filter_by(activa=True).order_by(Categoria.orden).all()
-    return jsonify([{'id': c.id, 'nombre': c.nombre, 'icono': c.icono, 'orden': c.orden} for c in categorias])
+    """Obtener categorías"""
+    include_inactive = request.args.get('all') == '1'
+    query = Categoria.query
+    if not include_inactive:
+        query = query.filter_by(activa=True)
+    categorias = query.order_by(Categoria.orden).all()
+    return jsonify([{'id': c.id, 'nombre': c.nombre, 'icono': c.icono, 'orden': c.orden, 'activa': c.activa} for c in categorias])
 
 @main_bp.route('/api/categorias', methods=['POST'])
 @jwt_required()
@@ -337,3 +344,53 @@ def update_categoria(id):
             categoria.activa = data['activa']
         db.session.commit()
     return jsonify({"message": "Categoría actualizada"})
+
+# ============= API IMÁGENES =============
+
+@main_bp.route('/api/upload', methods=['POST'])
+@jwt_required()
+def upload_image():
+    """Subir imagen al servidor"""
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+    
+    if file and allowed_file(file.filename):
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4().hex}.{ext}"
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        
+        url = f"/static/uploads/{filename}"
+        return jsonify({"url": url, "filename": filename}), 201
+    
+    return jsonify({"error": "File type not allowed"}), 400
+
+@main_bp.route('/api/images', methods=['GET'])
+@jwt_required()
+def list_images():
+    """Listar imágenes cargadas"""
+    if not os.path.exists(UPLOAD_FOLDER):
+        return jsonify([])
+    
+    images = []
+    for f in os.listdir(UPLOAD_FOLDER):
+        if allowed_file(f):
+            images.append({
+                "name": f,
+                "url": f"/static/uploads/{f}"
+            })
+    return jsonify(images)
+
+@main_bp.route('/api/images/<name>', methods=['DELETE'])
+@jwt_required()
+def delete_image(name):
+    """Eliminar imagen"""
+    filepath = os.path.join(UPLOAD_FOLDER, name)
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        return jsonify({"message": "Imagen eliminada"})
+    return jsonify({"error": "Imagen no encontrada"}), 404
