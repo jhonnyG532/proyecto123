@@ -28,6 +28,7 @@
         <ul class="nav nav-tabs mb-3">
             <li class="nav-item"><a class="nav-link active" href="#" data-tab="productos" onclick="showTab('productos')">Productos</a></li>
             <li class="nav-item"><a class="nav-link" href="#" data-tab="categorias" onclick="showTab('categorias')">Categorías</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-tab="sugerencias" onclick="showTab('sugerencias')">Sugerencias</a></li>
             <li class="nav-item"><a class="nav-link" href="#" data-tab="config" onclick="showTab('config')">Configuración</a></li>
         </ul>
         
@@ -73,57 +74,18 @@
                         <div class="col-md-4 mb-2 d-flex align-items-end">
                             <button class="btn btn-success me-2" onclick="saveProduct()">💾 Guardar</button>
                             <button type="button" class="btn btn-primary" id="btnNuevo">➕ Nuevo</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">Productos Existentes</div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0" id="prodTable">
-                        <thead><tr><th>Nombre</th><th>Precio</th><th>Cat</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+</div>
                 </div>
             </div>
         </div>
         
-        <!-- CATEGORIAS -->
-        <div id="tab-categorias" style="display:none;">
-            <div class="card mb-3">
-                <div class="card-header bg-success text-white">Nueva Categoría</div>
-                <div class="card-body">
-                    <input type="hidden" id="catId">
-                    <div class="row">
-                        <div class="col-md-4 mb-2">
-                            <label>Nombre *</label>
-                            <input type="text" class="form-control" id="catNom">
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <label>Icono</label>
-                            <select class="form-control" id="catIcon">
-                                <option value="bi-ufo">🚀 Ovni</option>
-                                <option value="bi-burger">🍔 Hamburguesa</option>
-                                <option value="bi-hot">🌭 Hotdog</option>
-                                <option value="bi-french-fries">🍟 Papa</option>
-                                <option value="bi-cup-straw">🥤 Bebida</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-2">
-                            <label>Orden</label>
-                            <input type="number" class="form-control" id="catOrd" value="0">
-                        </div>
-                        <div class="col-md-2 mb-2 d-flex align-items-end">
-                            <button class="btn btn-success w-100" onclick="saveCat()">💾 Guardar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- SUGERENCIAS -->
+        <div id="tab-sugerencias" style="display:none;">
             <div class="card">
-                <div class="card-header">Categorías</div>
+                <div class="card-header">Sugerencias de Clientes</div>
                 <div class="card-body p-0">
-                    <table class="table mb-0" id="catTable">
-                        <thead><tr><th>Nombre</th><th>Icono</th><th>Orden</th><th>Acciones</th></tr></thead>
+                    <table class="table" id="sugTable">
+                        <thead><tr><th>Nombre</th><th>Tipo</th><th>Mensaje</th><th>Fecha</th><th>Acción</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -209,9 +171,11 @@
         });
         document.getElementById('tab-productos').style.display = tab === 'productos' ? 'block' : 'none';
         document.getElementById('tab-categorias').style.display = tab === 'categorias' ? 'block' : 'none';
+        document.getElementById('tab-sugerencias').style.display = tab === 'sugerencias' ? 'block' : 'none';
         document.getElementById('tab-config').style.display = tab === 'config' ? 'block' : 'none';
         if (tab === 'productos') loadProducts();
         else if (tab === 'categorias') loadCats();
+        else if (tab === 'sugerencias') loadSugerencias();
         else if (tab === 'config') loadCfg();
     }
     
@@ -446,6 +410,27 @@
         .then(function(r) {
             if (r.ok) alert('✅ Guardado!');
         });
+    }
+    
+    // SUGERENCIAS
+    function loadSugerencias() {
+        fetch('/api/sugerencias', { headers: { 'Authorization': 'Bearer ' + tk } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var h = '';
+            data.forEach(function(s) {
+                var fecha = s.created_at ? new Date(s.created_at).toLocaleDateString() : '-';
+                h += '<tr><td>' + (s.nombre || 'Anónimo') + '</td><td>' + s.tipo + '</td><td>' + (s.mensaje || '').substring(0,50) + '</td><td>' + fecha + '</td><td><button class="btn btn-sm btn-danger" onclick="delSug(' + s.id + ')">🗑️</button></td></tr>';
+            });
+            document.querySelector('#sugTable tbody').innerHTML = h || 'No hay sugerencias';
+        });
+    }
+    
+    function delSug(id) {
+        if (confirm('¿Eliminar?')) {
+            fetch('/api/sugerencias/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + tk } })
+            .then(function() { loadSugerencias(); });
+        }
     }
     
     // INIT
