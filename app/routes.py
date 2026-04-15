@@ -2,6 +2,7 @@ import os
 import uuid
 from flask import Blueprint, render_template, jsonify, request, send_from_directory
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.models import db, Producto, Configuracion, Categoria, Sugerencia
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
