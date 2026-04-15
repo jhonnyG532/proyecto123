@@ -72,7 +72,7 @@
                         </div>
                         <div class="col-md-4 mb-2 d-flex align-items-end">
                             <button class="btn btn-success me-2" onclick="saveProduct()">💾 Guardar</button>
-                            <button class="btn btn-primary" onclick="newProduct()">➕ Nuevo</button>
+                            <button type="button" class="btn btn-primary" id="btnNuevo">➕ Nuevo</button>
                         </div>
                     </div>
                 </div>
@@ -187,6 +187,18 @@
     if (!tk) window.location.href = '/panel-galaxia-2026';
     
     function logout() { localStorage.clear(); window.location.href = '/panel-galaxia-2026'; }
+    
+    // Botón Nuevo - agregar producto
+    document.getElementById('btnNuevo').onclick = function() {
+        document.getElementById('prodId').value = '';
+        document.getElementById('prodNombre').value = '';
+        document.getElementById('prodPrecio').value = '';
+        document.getElementById('prodCat').value = '';
+        document.getElementById('prodDesc').value = '';
+        document.getElementById('prodImg').value = '';
+        document.getElementById('prodStock').value = '100';
+        document.getElementById('prodDisp').value = 'true';
+    };
     
     var galleryModal = new bootstrap.Modal(document.getElementById('galleryModal'));
     
