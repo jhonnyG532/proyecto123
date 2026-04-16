@@ -403,7 +403,9 @@ document.getElementById('feedbackForm').onsubmit = async (e) => {
         
         const data = await res.json();
 
-        if (data.id || data.message) {
+        console.log('Response:', res.status, data);
+        
+        if (res.ok && (data.id || data.message)) {
             gsap.to('#formContainer', {
                 opacity: 0,
                 y: -30,
