@@ -818,13 +818,14 @@
     }
 
     function loadGallery() {
+        document.getElementById('imgGrid').innerHTML = '<p class="text-center">Cargando...</p>';
         fetch('/api/images', { headers: { 'Authorization': 'Bearer ' + tk } })
         .then(function(r) { return r.json(); })
         .then(function(data) {
             var html = '';
             data.forEach(function(i) {
-                html += '<div class="col-md-3 mb-3">';
-                html += '<img src="' + i.url + '" class="img-thumbnail" style="height:80px;object-fit:cover;cursor:pointer;border-radius:8px;" onclick="selectImg(\'' + i.url + '\')">';
+                html += '<div class="col-4 col-md-3 mb-2">';
+                html += '<img src="' + i.url + '?v=' + Date.now() + '" loading="lazy" class="img-thumbnail" style="height:60px;object-fit:cover;cursor:pointer;border-radius:6px;" onclick="selectImg(\'' + i.url + '\')">';
                 html += '</div>';
             });
             document.getElementById('imgGrid').innerHTML = html || '<p class="text-muted">No hay imagenes</p>';
@@ -836,18 +837,35 @@
         galleryModal.hide();
     }
 
-    function uploadImage() {
+function uploadImage() {
         var fi = document.getElementById('fileSel');
         if (!fi.files[0]) return alert('Selecciona archivo');
         
         var fd = new FormData();
         fd.append('file', fi.files[0]);
         
+        var btn = document.querySelector('#uploadForm button');
+        btn.disabled = true;
+        btn.innerHTML = 'Subiendo...';
+        
         fetch('/api/upload', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + tk },
             body: fd
-        }).then(function(r) { if (r.ok) { alert('Subida'); loadGallery(); } });
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            alert('Imagen subida!');
+            fi.value = '';
+            loadGallery();
+        })
+        .catch(function() {
+            alert('Error al subir');
+        })
+        .finally(function() {
+            btn.disabled = false;
+            btn.innerHTML = 'Subir';
+        });
     }
 
     loadDashboard();
