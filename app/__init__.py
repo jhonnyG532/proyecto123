@@ -7,7 +7,7 @@ def create_app():
     from flask import Flask
     from flask_jwt_extended import JWTManager
     import config
-    from app.models import db, Producto, Configuracion, Usuario, Categoria, Mesa
+    from app.models import db, Producto, Configuracion, Usuario, Categoria, Mesa, Sugerencia
 
     app = Flask(__name__)
     app.config.from_object(config.Config)

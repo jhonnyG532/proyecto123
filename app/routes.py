@@ -110,33 +110,37 @@ def admin_dashboard():
 @main_bp.route('/api/sugerencias', methods=['POST'])
 def enviar_sugerencia():
     """Enviar sugerencia (público)"""
-    # Skip rate limiting for suggestions to avoid blocking
-    
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({"error": "Datos inválidos"}), 400
-    
-    mensaje = data.get('mensaje', '')
-    if not mensaje or len(mensaje) < 3:
-        return jsonify({"error": "Mensaje requerido"}), 400
-    
-    # Sanitizar mensaje
-    mensaje = sanitize_html(mensaje[:500])  # Limitar a 500 caracteres
-    
-    sugerencia = Sugerencia(
-        nombre=sanitize_html(data.get('nombre', 'Anónimo')[:100]),
-        telefono=sanitize_html(data.get('telefono', '')[:20]),
-        correo=sanitize_html(data.get('correo', '')[:100]),
-        tipo=data.get('tipo', 'sugerencia'),
-        mensaje=mensaje,
-        rating=int(data.get('rating', 5) or 5)
-    )
-    db.session.add(sugerencia)
-    db.session.commit()
-    return jsonify({
-        "message": "¡Gracias! Tu opinión es importante.",
-        "id": sugerencia.id
-    }), 201
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"error": "Datos inválidos"}), 400
+        
+        mensaje = data.get('mensaje', '')
+        if not mensaje or len(mensaje) < 3:
+            return jsonify({"error": "Mensaje requerido"}), 400
+        
+        # Sanitizar mensaje
+        mensaje = sanitize_html(mensaje[:500])  # Limitar a 500 caracteres
+        
+        sugerencia = Sugerencia(
+            nombre=sanitize_html(data.get('nombre', 'Anónimo')[:100]),
+            telefono=sanitize_html(data.get('telefono', '')[:20]),
+            correo=sanitize_html(data.get('correo', '')[:100]),
+            tipo=data.get('tipo', 'sugerencia'),
+            mensaje=mensaje,
+            rating=int(data.get('rating', 5) or 5)
+        )
+        db.session.add(sugerencia)
+        db.session.commit()
+        return jsonify({
+            "message": "¡Gracias! Tu opinión es importante.",
+            "id": sugerencia.id
+        }), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
 @main_bp.route('/api/sugerencias', methods=['GET'])
 @jwt_required()
