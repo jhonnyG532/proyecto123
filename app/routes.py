@@ -366,6 +366,39 @@ def update_categoria(id):
 
 # ============= API IMÁGENES =============
 
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+
+def optimize_image(filepath):
+    """Optimizar imagen para cargar rápido"""
+    if not PIL_AVAILABLE:
+        return
+    try:
+        with Image.open(filepath) as img:
+            # Convertir a WebP si es posible
+            if img.mode in ('RGBA', 'LA'):
+                img = img.convert('RGB')
+            
+            # Redimensionar si es muy grande (máx 800px)
+            max_size = 800
+            if img.width > max_size or img.height > max_size:
+                img.thumbnail((max_size, max_size), Image.LANCZOS)
+            
+            # Guardar como WebP optimizado
+            new_path = filepath.rsplit('.', 1)[0] + '.webp'
+            img.save(new_path, 'WEBP', quality=80, optimize=True)
+            
+            # Eliminar original
+            os.remove(filepath)
+            return new_path
+    except Exception as e:
+        print(f"Error optimizing image: {e}")
+        return filepath
+    return filepath
+
 @main_bp.route('/api/upload', methods=['POST'])
 @jwt_required()
 def upload_image():
@@ -383,8 +416,12 @@ def upload_image():
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
         
-        url = f"/static/uploads/{filename}"
-        return jsonify({"url": url, "filename": filename}), 201
+        # Optimizar imagen
+        optimized_path = optimize_image(filepath)
+        final_filename = os.path.basename(optimized_path)
+        
+        url = f"/static/uploads/{final_filename}"
+        return jsonify({"url": url, "filename": final_filename}), 201
     
     return jsonify({"error": "File type not allowed"}), 400
 
