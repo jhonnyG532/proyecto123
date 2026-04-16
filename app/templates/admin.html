@@ -734,6 +734,8 @@
         var id = document.getElementById('prodId').value;
         var url = id ? '/api/productos/' + id : '/api/productos';
         var method = id ? 'PUT' : 'POST';
+        
+        console.log('Saving:', method, url);
 
         fetch(url, {
             method: method,
@@ -754,11 +756,16 @@
                 loadProducts(); 
                 newProduct(); 
             } else {
-                alert('❌ Error al guardar');
+                return r.json().then(function(d) {
+                    alert('❌ Error: ' + (d.error || 'Desconocido'));
+                });
             }
+        }).catch(function(err) {
+            alert('❌ Error de red');
+            console.error(err);
         }).finally(function() {
             btn.disabled = false;
-            btn.innerHTML = '💾 Guardar';
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Guardar';
         });
     }
 
