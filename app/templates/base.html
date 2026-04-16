@@ -372,19 +372,19 @@
                         {{ config.nombre_negocio }}
                     </h5>
                     <p class="mb-3">El mejor sabor de la galaxia directa a tu mesa.</p>
-                    <div class="social-links">
+                    <div class="social-links" style="display: flex; gap: 12px; margin-top: 12px;">
                         {% if whatsapp_url_open %}
-                        <a href="{{ whatsapp_url_open }}" target="_blank" class="social-btn whatsapp" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        <a href="{{ whatsapp_url_open }}" target="_blank" class="social-btn whatsapp" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.1);color:#25d366 !important;" title="WhatsApp"><i class="bi bi-whatsapp" style="font-size: 1.3rem;"></i></a>
                         {% endif %}
                         {% if instagram_url %}
-                        <a href="{{ instagram_url }}" target="_blank" class="social-btn instagram" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="{{ instagram_url }}" target="_blank" class="social-btn instagram" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.1);color:#e1306c !important;" title="Instagram"><i class="bi bi-instagram" style="font-size: 1.3rem;"></i></a>
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <h5>Contacto</h5>
-                    <p><i class="bi bi-geo-alt me-2"></i>{{ config.direccion }}</p>
-                    <p><i class="bi bi-telephone me-2"></i>{{ config.telefono }}</p>
+                <div class="col-lg-4" style="min-height: 100px;">
+                    <h5 style="color: #00f5d4 !important;">Contacto</h5>
+                    <p style="color: #fff !important;"><i class="bi bi-geo-alt me-2"></i>{{ config.direccion }}</p>
+                    <p style="color: #fff !important;"><i class="bi bi-telephone me-2"></i>{{ config.telefono }}</p>
                 </div>
                 <div class="col-lg-4">
                     <h5>Horarios</h5>

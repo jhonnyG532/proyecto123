@@ -198,6 +198,7 @@ def get_productos():
             codigo=codigo,
             nombre=nombre[:100],
             descripcion=sanitize_html(data.get('descripcion', ''))[:500],
+            ingredientes=sanitize_html(data.get('ingredientes', ''))[:500],
             precio=max(data.get('precio', 0), 0),
             categoria=sanitize_html(data.get('categoria', ''))[:50],
             imagen=sanitize_html(data.get('imagen', ''))[:300],
