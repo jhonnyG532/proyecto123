@@ -764,10 +764,6 @@ if (typeof gsap !== 'undefined') {
     gsap.from('.hero-title', { opacity: 0, y: 50, duration: 1, delay: 0.4 });
     gsap.from('.hero-subtitle', { opacity: 0, y: 30, duration: 0.8, delay: 0.6 });
     gsap.from('.hero-visual', { opacity: 0, scale: 0.8, duration: 1, delay: 0.8 });
-    
-    document.querySelectorAll('.product-card').forEach(function(card, i) {
-        gsap.from(card, { opacity: 0, y: 30, duration: 0.4, delay: i * 0.05 });
-    });
 }
 
 
