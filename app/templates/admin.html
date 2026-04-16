@@ -416,6 +416,10 @@
                             <label class="form-label">Descripcion</label>
                             <textarea class="form-control" id="prodDesc" rows="2" placeholder="Descripcion del producto"></textarea>
                         </div>
+                        <div class="col-12">
+                            <label class="form-label">Ingredientes (uno por linea)</label>
+                            <textarea class="form-control" id="prodIng" rows="3" placeholder="Carne 100%&#10;Cebolla grille&#10;Queso cheddar"></textarea>
+                        </div>
                         <div class="col-md-3">
                             <label class="form-label">Stock</label>
                             <input type="number" class="form-control" id="prodStock" value="100">
@@ -698,6 +702,7 @@
         document.getElementById('prodPrecio').value = p.precio;
         document.getElementById('prodCat').value = p.categoria || '';
         document.getElementById('prodDesc').value = p.descripcion || '';
+        document.getElementById('prodIng').value = p.ingredientes || '';
         document.getElementById('prodImg').value = p.imagen || '';
         document.getElementById('prodStock').value = p.stock;
         document.getElementById('prodDisp').value = p.disponible ? 'true' : 'false';
@@ -711,6 +716,7 @@
         document.getElementById('prodCat').value = '';
         document.getElementById('prodDesc').value = '';
         document.getElementById('prodImg').value = '';
+        document.getElementById('prodIng').value = '';
         document.getElementById('prodStock').value = '100';
         document.getElementById('prodDisp').value = 'true';
         document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
@@ -737,6 +743,7 @@
                 precio: pre,
                 categoria: document.getElementById('prodCat').value,
                 descripcion: document.getElementById('prodDesc').value,
+                ingredientes: document.getElementById('prodIng').value,
                 imagen: document.getElementById('prodImg').value,
                 stock: parseInt(document.getElementById('prodStock').value) || 100,
                 disponible: document.getElementById('prodDisp').value === 'true'

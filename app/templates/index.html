@@ -353,6 +353,26 @@
 }
 .offcanvas .cart-item-info h6 { margin: 0 0 4px; font-size: 0.95rem; }
 .offcanvas .cart-item-info small { color: var(--text-muted); }
+.offcanvas .ingredient-checklist {
+    margin: 8px 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+}
+.offcanvas .ing-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.offcanvas .ing-item input {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent-primary);
+}
 .offcanvas .cart-item-actions {
     display: flex;
     align-items: center;
@@ -488,7 +508,7 @@
                                         <span class="qty-value" id="qty-{{ item.id }}">1</span>
                                         <button class="qty-btn qty-plus" onclick="changeQty({{ item.id }}, 1)">+</button>
                                     </div>
-                                    <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.nombre|e }}', {{ item.precio }})">
+                                    <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.nombre|e }}', {{ item.precio }}, '{{ item.ingredientes|default('')|e }}')">
                                         <i class="bi bi-plus"></i>
                                     </button>
                                 </div>
@@ -589,8 +609,9 @@ function changeQty(id, delta) {
     el.textContent = val;
 }
 
-function addToCart(id, nombre, precio) {
+function addToCart(id, nombre, precio, ingredientes) {
     var cant = parseInt(document.getElementById('qty-' + id).textContent);
+    ingredientes = ingredientes || '';
     
     var existing = null;
     for (var i = 0; i < cart.length; i++) {
@@ -602,7 +623,7 @@ function addToCart(id, nombre, precio) {
     if (existing) {
         existing.cantidad += cant;
     } else {
-        cart.push({ id: id, nombre: nombre, precio: precio, cantidad: cant });
+        cart.push({ id: id, nombre: nombre, precio: precio, cantidad: cant, ingredientes: ingredientes });
     }
     
     updateCart();
@@ -637,7 +658,18 @@ function updateCart() {
             total += subtotal;
             count += item.cantidad;
             html += '<div class="cart-item">';
-            html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6><small>$' + item.precio + ' x ' + item.cantidad + '</small></div>';
+            html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6>';
+            if (item.ingredientes) {
+                var ings = item.ingredientes.split('\n');
+                html += '<div class="ingredient-checklist">';
+                for (var j = 0; j < ings.length; j++) {
+                    if (ings[j].trim()) {
+                        html += '<label class="ing-item"><input type="checkbox" checked> ' + ings[j] + '</label>';
+                    }
+                }
+                html += '</div>';
+            }
+            html += '<small>$' + item.precio + ' x ' + item.cantidad + '</small></div>';
             html += '<div class="cart-item-actions">';
             html += '<span class="cart-item-price">$' + subtotal + '</span>';
             html += '<button class="delete-btn" onclick="removeFromCart(' + i + ')"><i class="bi bi-trash"></i></button>';
