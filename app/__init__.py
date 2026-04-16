@@ -32,7 +32,7 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-        if not Configuracion.query.first():
+        if Configuracion.query.count() < 1:
             db.session.add(Configuracion(
                 nombre_negocio='Ovni Burger',
                 direccion='Barbosa, Santander',
@@ -42,11 +42,11 @@ def create_app():
                 instagram='burger.ovni',
             ))
 
-        if not Categoria.query.first():
+        if Categoria.query.count() < 3:
             for c in [('hamburguesas', 'bi-ufo', 1), ('hotdogs', 'bi-hot', 2), ('crateres', 'bi-french-fries', 3)]:
                 db.session.add(Categoria(nombre=c[0], icono=c[1], orden=c[2]))
 
-        if not Producto.query.first():
+        if Producto.query.count() < 3:
             productos = [
                 ('HAM01', 'La Órbita Clásica', 'Carne 100% premium, cebolla grille, jamón, queso cheddar, vegetales frescos, salsa secreta.', 18000, 'hamburguesas', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400'),
                 ('HAM01P', 'La Órbita Clásica + Papa', 'La clásica + papa frita crujiente.', 20000, 'hamburguesas', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400'),
@@ -63,7 +63,7 @@ def create_app():
             for p in productos:
                 db.session.add(Producto(codigo=p[0], nombre=p[1], descripcion=p[2], precio=p[3], categoria=p[4], imagen=p[5]))
 
-        if not Usuario.query.filter_by(username='jhonny').first():
+        if Usuario.query.count() < 1:
             admin = Usuario(username='jhonny')
             admin.set_password('5331')
             db.session.add(admin)

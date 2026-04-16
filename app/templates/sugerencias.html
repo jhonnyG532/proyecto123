@@ -381,9 +381,12 @@ document.getElementById('feedbackForm').onsubmit = async (e) => {
 
     const tipo = document.querySelector('input[name="tipo"]:checked').value;
     const ratingEl = document.querySelector('input[name="rating"]:checked');
-    const rating = ratingEl ? ratingEl.value : '5';
+    const rating = ratingEl ? parseInt(ratingEl.value) : 5;
 
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
         const res = await fetch('/api/sugerencias', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -392,9 +395,12 @@ document.getElementById('feedbackForm').onsubmit = async (e) => {
                 mensaje: mensaje,
                 nombre: document.getElementById('sugNombre').value || 'Anónimo',
                 telefono: document.getElementById('sugTelefono').value,
-                rating: parseInt(rating)
-            })
+                rating: rating
+            }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
+        
         const data = await res.json();
 
         if (data.id || data.message) {
@@ -416,7 +422,11 @@ document.getElementById('feedbackForm').onsubmit = async (e) => {
             btn.innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
         }
     } catch (err) {
-        showToast('Error de conexión', 'error');
+        if (err.name === 'AbortError') {
+            showToast('Tiempo de espera agotado', 'error');
+        } else {
+            showToast('Error de conexión', 'error');
+        }
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
     }
