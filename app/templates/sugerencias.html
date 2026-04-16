@@ -401,33 +401,47 @@ document.getElementById('feedbackForm').onsubmit = async (e) => {
         });
         clearTimeout(timeoutId);
         
-        const data = await res.json();
+        // Obtenemos el texto en lugar de json directamente por si no es un JSON válido
+        const textData = await res.text();
+        let data = {};
+        try {
+            data = JSON.parse(textData);
+        } catch (e) {
+            console.error('El backend no devolvió JSON:', textData);
+            throw new Error('Respuesta no válida del servidor. Código: ' + res.status);
+        }
 
         console.log('Response:', res.status, data);
         
         if (res.ok && (data.id || data.message)) {
-            gsap.to('#formContainer', {
-                opacity: 0,
-                y: -30,
-                duration: 0.4,
-                onComplete: () => {
-                    document.getElementById('formContainer').style.display = 'none';
-                    document.getElementById('successAnimation').classList.add('show');
-                    gsap.from('.success-icon', { scale: 0, duration: 0.6, ease: 'back.out(1.7)' });
-                    gsap.from('.success-animation h3', { opacity: 0, y: 20, duration: 0.5, delay: 0.3 });
-                    gsap.from('.success-animation p', { opacity: 0, y: 20, duration: 0.5, delay: 0.5 });
-                }
-            });
+            if (typeof gsap !== 'undefined') {
+                gsap.to('#formContainer', {
+                    opacity: 0,
+                    y: -30,
+                    duration: 0.4,
+                    onComplete: () => {
+                        document.getElementById('formContainer').style.display = 'none';
+                        document.getElementById('successAnimation').classList.add('show');
+                        gsap.from('.success-icon', { scale: 0, duration: 0.6, ease: 'back.out(1.7)' });
+                        gsap.from('.success-animation h3', { opacity: 0, y: 20, duration: 0.5, delay: 0.3 });
+                        gsap.from('.success-animation p', { opacity: 0, y: 20, duration: 0.5, delay: 0.5 });
+                    }
+                });
+            } else {
+                document.getElementById('formContainer').style.display = 'none';
+                document.getElementById('successAnimation').classList.add('show');
+            }
         } else {
             showToast(data.error || 'Error al enviar', 'error');
             btn.disabled = false;
             btn.innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
         }
     } catch (err) {
+        console.error('Submit error:', err);
         if (err.name === 'AbortError') {
             showToast('Tiempo de espera agotado', 'error');
         } else {
-            showToast('Error de conexión', 'error');
+            showToast(err.message || 'Error de conexión', 'error');
         }
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
