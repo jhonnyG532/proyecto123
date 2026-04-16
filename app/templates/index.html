@@ -770,18 +770,6 @@ if (typeof gsap !== 'undefined') {
     });
 }
 
-function showToast(msg, tipo) {
-    var container = document.getElementById('toast-container');
-    var toast = document.createElement('div');
-    toast.className = 'toast toast-' + tipo;
-    var icon = tipo === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill';
-    toast.innerHTML = '<i class="bi bi-' + icon + '"></i>' + msg;
-    container.appendChild(toast);
-    setTimeout(function() { toast.classList.add('show'); }, 10);
-    setTimeout(function() {
-        toast.classList.remove('show');
-        setTimeout(function() { toast.remove(); }, 400);
-    }, 3000);
-}
+
 </script>
 {% endblock %}

@@ -444,7 +444,23 @@
             );
         });
     </script>
-    <script>window.OVNI_WHATSAPP_PHONE = {{ whatsapp_digits|tojson }};</script>
+    <script>
+        window.OVNI_WHATSAPP_PHONE = {{ whatsapp_digits|tojson }};
+        function showToast(msg, tipo) {
+            var container = document.getElementById('toast-container');
+            if (!container) return;
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + tipo;
+            var icon = tipo === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill';
+            toast.innerHTML = '<i class="bi bi-' + icon + '"></i>' + msg;
+            container.appendChild(toast);
+            setTimeout(function() { toast.classList.add('show'); }, 10);
+            setTimeout(function() {
+                toast.classList.remove('show');
+                setTimeout(function() { toast.remove(); }, 400);
+            }, 3000);
+        }
+    </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
