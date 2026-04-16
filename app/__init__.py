@@ -19,6 +19,16 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
 
+    @app.after_request
+    def set_security_headers(response):
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        # CSP restrictivo pero permitiendo estilos/fuentes de bootstrap/google
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https://images.unsplash.com;"
+        return response
+
     with app.app_context():
         db.create_all()
 

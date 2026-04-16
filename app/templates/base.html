@@ -3,58 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ config.nombre_negocio }} - Las mejores hamburguesas del universo">
+    <meta name="theme-color" content="#0f1026">
     <title>{% block title %}{{ config.nombre_negocio }}{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        :root { --primary: #2c1810; --secondary: #8b4513; --accent: #d4a574; --gradient: linear-gradient(135deg, var(--primary), var(--secondary)); }
-        * { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        body { font-family: 'Nunito', sans-serif; background-color: #fffdfa; }
-        .navbar { background: var(--gradient) !important; box-shadow: 0 10px 30px rgba(44, 24, 16, 0.2); padding: 20px 0; border-radius: 0 0 20px 50px; margin-bottom: 10px;}
-        .navbar-brand { font-weight: 900; font-size: 1.8rem; letter-spacing: 1px; color: #fff !important; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        .navbar-brand:hover { transform: scale(1.05) rotate(-2deg); text-shadow: 0 0 20px rgba(255,255,255,0.8); }
-        .nav-link { font-weight: 700; border-radius: 20px 5px 20px 5px; padding: 8px 20px !important; margin: 0 5px; border: 2px solid transparent; color: #fff !important; position: relative; overflow: hidden; z-index: 1;}
-        .nav-link::before { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 100%; background: rgba(255,255,255,0.15); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: -1; border-radius: 20px 5px 20px 5px; }
-        .nav-link:hover::before { width: 100%; border-radius: 5px 20px 5px 20px;}
-        .nav-link:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); border-radius: 5px 20px 5px 20px; }
-        footer { background: var(--gradient); color: white; padding: 60px 0 30px; margin-top: 80px; border-radius: 50% 10% 0 0 / 20% 40% 0 0; position: relative; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.15);}
-        footer::before { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; bottom: -50px; left: -50px; animation: footermorph 6s linear infinite; }
-        @keyframes footermorph { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        footer h5 { font-weight: 800; margin-bottom: 25px; position: relative; display: inline-block; z-index: 1;}
-        footer h5::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 60%; height: 4px; background: var(--accent); border-radius: 4px 0 4px 0; }
-        .footer-content { position: relative; z-index: 1; }
-        .social-links { display: flex; gap: 15px; margin-top: 20px; }
-        .social-btn { display: inline-flex; width: 50px; height: 50px; border-radius: 40% 60% 60% 40% / 50% 50% 50% 50%; color: white !important; background: rgba(255,255,255,0.12); border: 2px solid var(--accent); align-items: center; justify-content: center; font-size: 1.4rem; text-decoration: none; }
-        .social-btn:hover { background: var(--accent); color: var(--primary) !important; transform: translateY(-5px) rotate(8deg); box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-radius: 60% 40% 40% 60% / 50% 50% 50% 50%;}
-        #toast-container { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 12px; z-index: 9999; }
-        .toast { padding: 18px 30px; border-radius: 20px 5px 20px 5px; color: white; font-weight: 800; opacity: 0; transform: translateY(40px) scale(0.8) rotate(-2deg); transition: all 0.5s; box-shadow: 0 15px 35px rgba(0,0,0,0.3); min-width: 260px; border: none; }
-        .toast-success { background: linear-gradient(135deg, #28a745, #20c997); }
-        .toast-error { background: linear-gradient(135deg, #dc3545, #c82333); }
-        .toast.show { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+        :root {
+            --bg-deep: #0a0b14;
+            --bg-surface: #12141f;
+            --bg-card: rgba(18, 20, 31, 0.7);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --accent-primary: #00f5d4;
+            --accent-secondary: #7b2cbf;
+            --accent-tertiary: #ff6b35;
+            --gradient-primary: linear-gradient(135deg, #00f5d4 0%, #00bbf9 50%, #7b2cbf 100%);
+            --gradient-hero: linear-gradient(180deg, rgba(10, 11, 20, 0) 0%, rgba(10, 11, 20, 0.9) 100%);
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 40px rgba(0, 245, 212, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *::selection { background: var(--accent-primary); color: var(--bg-deep); }
+        
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            font-family: 'Space Grotesk', sans-serif; 
+            background: var(--bg-deep); 
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, h6, .heading { 
+            font-family: 'Syne', sans-serif; 
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-secondary); }
+
+        .navbar {
+            background: rgba(10, 11, 20, 0.8) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px 0;
+            transition: var(--transition-smooth);
+        }
+        .navbar.scrolled {
+            background: rgba(10, 11, 20, 0.95) !important;
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        .navbar-brand { 
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, #00f5d4, #00bbf9, #7b2cbf, #ff6b35, #00f5d4);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition-bounce);
+            animation: shineText 2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+        }
+        @keyframes shineText {
+            0% { background-position: 0% center; filter: drop-shadow(0 0 10px rgba(0,245,212,0.4)); transform: scale(1);}
+            50% { background-position: 150% center; filter: drop-shadow(0 0 30px rgba(123,44,191,0.8)); transform: scale(1.05);}
+            100% { background-position: 300% center; filter: drop-shadow(0 0 10px rgba(0,245,212,0.4)); transform: scale(1);}
+        }
+        .navbar-brand:hover { transform: scale(1.1); }
+        .navbar-brand .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(90deg, #00f5d4, #00bbf9, #7b2cbf, #ff6b35, #00f5d4);
+            background-size: 300% auto;
+            animation: shineText 2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            -webkit-text-fill-color: initial;
+            box-shadow: var(--shadow-glow);
+        }
+        .nav-link {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+            color: var(--text-secondary) !important;
+            padding: 10px 18px !important;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition-smooth);
+            border-radius: var(--radius-sm);
+        }
+        .nav-link:hover { color: var(--text-primary) !important; }
+        .nav-link:hover::before { opacity: 0.1; transform: scaleX(1); }
+        .nav-link.active { color: var(--accent-primary) !important; }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 12px 28px;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--bg-deep);
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 245, 212, 0.3);
+            color: var(--bg-deep);
+        }
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary:active { transform: translateY(-1px); }
+
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+        }
+
+        footer {
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #060510 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 80px 0 40px;
+            margin-top: 120px;
+        }
+        footer h5 {
+            font-family: 'Syne', sans-serif;
+            color: var(--accent-primary);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+        footer p { color: var(--text-muted); }
+        footer a { color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast); }
+        footer a:hover { color: var(--accent-primary); }
+
+        .social-links { display: flex; gap: 12px; }
+        .social-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: var(--transition-bounce);
+        }
+        .social-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-deep);
+            transform: translateY(-4px) scale(1.1);
+            box-shadow: 0 8px 24px rgba(0, 245, 212, 0.3);
+        }
+        .social-btn.whatsapp:hover { background: #25d366; border-color: #25d366; }
+        .social-btn.instagram:hover { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border-color: transparent; }
+
+        #toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: var(--transition-smooth);
+            pointer-events: auto;
+        }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast i { font-size: 1.4rem; }
+        .toast-success i { color: var(--accent-primary); }
+        .toast-success { border-color: var(--accent-primary); }
+        .toast-error i { color: #ff4757; }
+        .toast-error { border-color: #ff4757; }
+
+        .modal-content, .offcanvas {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+        }
+        .offcanvas-header { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .offcanvas-title { font-family: 'Syne', sans-serif; font-weight: 700; }
+        .btn-close { filter: invert(1); opacity: 0.5; }
+        .btn-close:hover { opacity: 1; }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: var(--transition-fast);
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 245, 212, 0.15);
+            color: var(--text-primary);
+        }
+        .form-control::placeholder { color: var(--text-muted); }
+        .form-label { font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; font-size: 0.9rem; }
+
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float-particle 20s linear infinite;
+        }
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        .section-reveal {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand { font-size: 1.2rem; }
+            .navbar-brand .logo-icon { width: 32px; height: 32px; }
+            #toast-container { bottom: 20px; right: 20px; left: 20px; }
+            .toast { padding: 14px 18px; }
+        }
     </style>
 </head>
 <body>
+    <div class="particles-container" id="particles"></div>
+    
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="/"><i class="bi bi-ufo"></i> {{ config.nombre_negocio }}</a>
-            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <a class="navbar-brand" href="/">
+                <span class="logo-icon" style="background: transparent; box-shadow: none;">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: var(--shadow-glow);">
+                </span>
+                {{ config.nombre_negocio }}
+            </a>
+            <button class="navbar-toggler border-0" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Menú</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/">Menú</a></li>
                     <li class="nav-item"><a class="nav-link" href="/sugerencias">Sugerencias</a></li>
                 </ul>
             </div>
         </div>
     </nav>
+
     {% block content %}{% endblock %}
+
     <footer>
-        <div class="container footer-content">
-            <div class="row">
-                <div class="col-md-4 mb-4 mb-md-0">
-                    <h5><i class="bi bi-ufo"></i> {{ config.nombre_negocio }}</h5>
-                    <p>El mejor sabor de la galaxia.</p>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 style="display: flex; align-items: center;">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width: 28px; height: 28px; object-fit: cover; border-radius: 50%; margin-right: 10px; box-shadow: var(--shadow-glow);">
+                        {{ config.nombre_negocio }}
+                    </h5>
+                    <p class="mb-3">El mejor sabor de la galaxia directa a tu mesa.</p>
                     <div class="social-links">
                         {% if whatsapp_url_open %}
                         <a href="{{ whatsapp_url_open }}" target="_blank" class="social-btn whatsapp" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
@@ -64,23 +355,70 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-md-4 mb-4 mb-md-0">
+                <div class="col-lg-4">
                     <h5>Contacto</h5>
-                    <p><i class="bi bi-geo-alt-fill"></i> {{ config.direccion }}</p>
-                    <p><i class="bi bi-telephone-fill"></i> {{ config.telefono }}</p>
+                    <p><i class="bi bi-geo-alt me-2"></i>{{ config.direccion }}</p>
+                    <p><i class="bi bi-telephone me-2"></i>{{ config.telefono }}</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-4">
                     <h5>Horarios</h5>
-                    <p>Lun - Vie: 7AM - 9PM</p>
-                    <p>Sáb - Dom: 8AM - 10PM</p>
+                    <p>Mié - Vie: 6:00 PM - 11:00 PM</p>
+                    <p>Sábados: 5:00 PM - 1:00 AM</p>
                 </div>
             </div>
-            <hr class="my-4">
-            <p class="text-center mb-0">{{ config.mensaje_pie }} ♥</p>
+            <hr class="my-5" style="border-color: rgba(255,255,255,0.05);">
+            <p class="text-center mb-0" style="color: var(--text-muted);">
+                © 2026 {{ config.nombre_negocio }}. {{ config.mensaje_pie }}
+            </p>
         </div>
     </footer>
+
     <div id="toast-container"></div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            particle.style.width = (Math.random() * 4 + 2) + 'px';
+            particle.style.height = particle.style.width;
+            particlesContainer.appendChild(particle);
+        }
+
+        document.querySelectorAll('.section-reveal').forEach(el => {
+            gsap.fromTo(el, 
+                { opacity: 0, y: 60 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reverse'
+                    }
+                }
+            );
+        });
+    </script>
     <script>window.OVNI_WHATSAPP_PHONE = {{ whatsapp_digits|tojson }};</script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}

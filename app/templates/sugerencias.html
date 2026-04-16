@@ -2,126 +2,438 @@
 {% block title %}Sugerencias - {{ config.nombre_negocio }}{% endblock %}
 {% block content %}
 <style>
-.page-header { background: linear-gradient(135deg, #2c1810, #8b4513); padding: 80px 0 60px; margin-bottom: 40px; border-radius: 0 0 40% 10% / 0 0 10% 40%; position: relative; overflow: hidden;}
-.page-header::after { content: ''; position: absolute; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; top: -20px; left: -20px; animation: spin 8s linear infinite;}
-@keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes cardEnter { 0% { opacity: 0; transform: translateY(50px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-.card { border: none; border-radius: 40px 10px 40px 10px; box-shadow: -10px 15px 35px rgba(0,0,0,0.1); background: #fffdfa; animation: cardEnter 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;}
-.card:hover { transform: translateY(-5px); box-shadow: -15px 25px 45px rgba(0,0,0,0.15); border-radius: 10px 40px 10px 40px; }
-.form-control, .form-select { border: 2px solid #e9ecef; border-radius: 15px 5px 15px 5px; }
-.form-control:focus, .form-select:focus { border-radius: 5px 15px 5px 15px; border-color: #8b4513; box-shadow: none; }
-.star-rating { direction: rtl; display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+.page-header {
+    padding: 120px 0 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(123, 44, 191, 0.2) 0%, transparent 60%);
+    pointer-events: none;
+}
+.header-content {
+    position: relative;
+    z-index: 1;
+}
+.header-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--bg-deep);
+    margin: 0 auto 30px;
+    box-shadow: 0 20px 60px rgba(0, 245, 212, 0.3);
+}
+.page-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 16px;
+}
+.page-header p {
+    color: var(--text-secondary);
+    font-size: 1.15rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.feedback-section {
+    padding: 60px 0 100px;
+}
+.feedback-card {
+    background: var(--bg-surface);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    padding: 48px;
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.form-section {
+    margin-bottom: 40px;
+}
+.form-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.form-section-title i {
+    color: var(--accent-primary);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+.form-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+.form-control, .form-select {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: all 0.3s;
+}
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(0, 245, 212, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+textarea.form-control {
+    resize: none;
+    min-height: 120px;
+}
+
+.type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.type-option {
+    position: relative;
+}
+.type-option input { display: none; }
+.type-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+.type-option label i { font-size: 1.5rem; color: var(--text-muted); transition: all 0.3s; }
+.type-option label span { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
+.type-option input:checked + label {
+    border-color: var(--accent-primary);
+    background: rgba(0, 245, 212, 0.08);
+}
+.type-option input:checked + label i { color: var(--accent-primary); }
+.type-option input:checked + label span { color: var(--accent-primary); }
+.type-option label:hover { border-color: rgba(0, 245, 212, 0.3); }
+
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-direction: row-reverse;
+}
 .star-rating input { display: none; }
-.star-rating label { font-size: 2.2rem; color: #eee; cursor: pointer; transition: transform 0.2s; }
-.star-rating input:checked ~ label,
-.star-rating input:checked + label,
-.star-rating input:checked + label ~ label,
+.star-rating label {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+}
 .star-rating label:hover,
-.star-rating label:hover ~ label { color: #ffc107; transform: scale(1.1) rotate(5deg); }
-.custom-radio .form-check-input { width: 40px; height: 40px; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transition: all 0.3s; }
-.custom-radio .form-check-input:checked { transform: scale(1.1) rotate(15deg); }
-.custom-radio .form-check-label { cursor: pointer; font-weight: 700;}
-.btn-success { background: #d4a574; border: none; border-radius: 10px 30px 10px 30px; font-weight: 800; color: #2c1810; }
-.btn-success:hover { background: #8b4513; transform: translateY(-3px) scale(1.02); border-radius: 30px 10px 30px 10px; color: #fff;}
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    text-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+}
+
+.submit-section {
+    text-align: center;
+    padding-top: 20px;
+}
+.btn-submit {
+    padding: 18px 48px;
+    background: linear-gradient(135deg, var(--accent-primary), #00bbf9);
+    border: none;
+    border-radius: 16px;
+    color: var(--bg-deep);
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.btn-submit:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 245, 212, 0.4);
+}
+.btn-submit:active { transform: translateY(-2px); }
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.success-animation {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+}
+.success-animation.show { display: block; }
+.success-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--accent-primary), #2ed573);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: white;
+    margin: 0 auto 30px;
+    box-shadow: 0 20px 60px rgba(0, 245, 212, 0.4);
+}
+.success-animation h3 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+}
+.success-animation p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+.btn-new {
+    margin-top: 30px;
+    padding: 14px 32px;
+    background: transparent;
+    border: 2px solid var(--accent-primary);
+    border-radius: 12px;
+    color: var(--accent-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-new:hover {
+    background: var(--accent-primary);
+    color: var(--bg-deep);
+}
+
+@media (max-width: 768px) {
+    .feedback-card { padding: 32px 24px; }
+    .type-selector { grid-template-columns: 1fr; }
+    .page-header { padding: 100px 0 60px; }
+    .header-icon { width: 80px; height: 80px; font-size: 2rem; }
+}
 </style>
-<div class="page-header text-center text-white">
-    <div class="container">
-        <h1><i class="bi bi-lightbulb"></i> Sugerencias</h1>
-        <p class="lead">Tu opinión nos ayuda a mejorar</p>
+
+<section class="page-header">
+    <div class="header-content">
+        <div class="header-icon">
+            <i class="bi bi-chat-heart"></i>
+        </div>
+        <h1>Tu Opinión nos Importa</h1>
+        <p>Ayúdanos a mejorar. Comparte tus sugerencias, comentarios o simplemente cuéntanos cómo fue tu experiencia.</p>
     </div>
-</div>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body p-4">
-                    <form id="formSugerencia">
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <label class="form-label">Tu nombre</label>
-                                <input type="text" class="form-control" id="sugNombre" placeholder="Escribe tu nombre">
+</section>
+
+<section class="feedback-section">
+    <div class="container">
+        <div class="feedback-card">
+            <div id="formContainer">
+                <form id="feedbackForm">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-person"></i>
+                            Sobre Ti
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="sugNombre" placeholder="Tu nombre">
                             </div>
-                            <div class="col-md-6">
+                            <div class="form-group">
                                 <label class="form-label">Teléfono (opcional)</label>
                                 <input type="tel" class="form-control" id="sugTelefono" placeholder="300 123 4567">
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">Tipo de mensaje</label>
-                            <div class="row">
-                                <div class="col-6 col-md-3 mb-2">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="tipo" id="tipo1" value="sugerencia" checked>
-                                        <label class="form-check-label" for="tipo1"><i class="bi bi-lightbulb d-block mb-1"></i> Sugerencia</label>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-3 mb-2">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="tipo" id="tipo2" value="queja">
-                                        <label class="form-check-label" for="tipo2"><i class="bi bi-emoji-angry d-block mb-1"></i> Queja</label>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-3 mb-2">
-                                    <div class="form-check custom-radio">
-                                        <input class="form-check-input" type="radio" name="tipo" id="tipo3" value="felicitacion">
-                                        <label class="form-check-label" for="tipo3"><i class="bi bi-heart d-block mb-1"></i> Felicitaciones</label>
-                                    </div>
-                                </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-chat-left-text"></i>
+                            Tipo de Mensaje
+                        </div>
+                        <div class="type-selector">
+                            <div class="type-option">
+                                <input type="radio" name="tipo" id="tipoSugerencia" value="sugerencia" checked>
+                                <label for="tipoSugerencia">
+                                    <i class="bi bi-lightbulb"></i>
+                                    <span>Idea</span>
+                                </label>
+                            </div>
+                            <div class="type-option">
+                                <input type="radio" name="tipo" id="tipoQueja" value="queja">
+                                <label for="tipoQueja">
+                                    <i class="bi bi-emoji-angry"></i>
+                                    <span>Queja</span>
+                                </label>
+                            </div>
+                            <div class="type-option">
+                                <input type="radio" name="tipo" id="tipoFelicitacion" value="felicitacion">
+                                <label for="tipoFelicitacion">
+                                    <i class="bi bi-heart"></i>
+                                    <span>Felicitación</span>
+                                </label>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">Tu opinión</label>
-                            <textarea class="form-control" id="sugMensaje" rows="4" placeholder="¿Qué opinas de nuestros productos?"></textarea>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-pencil"></i>
+                            Tu Mensaje
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">¿Cómo calificarías?</label>
-                            <div class="star-rating">
-                                <input type="radio" name="rating" id="star5" value="5" checked><label for="star5">★</label>
-                                <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
-                                <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
-                                <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
-                                <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
-                            </div>
+                        <div class="form-group">
+                            <textarea class="form-control" id="sugMensaje" rows="5" placeholder="Cuéntanos en detalle qué piensas..."></textarea>
                         </div>
-                        <button type="submit" class="btn btn-success btn-lg w-100">
-                            <i class="bi bi-send"></i> Enviar Sugerencia
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="bi bi-star"></i>
+                            Calificación
+                        </div>
+                        <div class="star-rating">
+                            <input type="radio" name="rating" id="star5" value="5" checked>
+                            <label for="star5">★</label>
+                            <input type="radio" name="rating" id="star4" value="4">
+                            <label for="star4">★</label>
+                            <input type="radio" name="rating" id="star3" value="3">
+                            <label for="star3">★</label>
+                            <input type="radio" name="rating" id="star2" value="2">
+                            <label for="star2">★</label>
+                            <input type="radio" name="rating" id="star1" value="1">
+                            <label for="star1">★</label>
+                        </div>
+                    </div>
+
+                    <div class="submit-section">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="bi bi-send"></i>
+                            Enviar Feedback
                         </button>
-                    </form>
+                    </div>
+                </form>
+            </div>
+
+            <div class="success-animation" id="successAnimation">
+                <div class="success-icon">
+                    <i class="bi bi-check-lg"></i>
                 </div>
+                <h3>¡Gracias por tu opinión!</h3>
+                <p>Tu feedback nos ayuda a seguir mejorando<br>para brindarte la mejor experiencia.</p>
+                <button class="btn-new" onclick="resetForm()">
+                    <i class="bi bi-plus-lg me-2"></i>Enviar otro
+                </button>
             </div>
         </div>
     </div>
-</div>
+</section>
+
 {% endblock %}
 {% block scripts %}
 <script>
-document.getElementById('formSugerencia').onsubmit = async (e) => {
+document.getElementById('feedbackForm').onsubmit = async (e) => {
     e.preventDefault();
+    
     const mensaje = document.getElementById('sugMensaje').value.trim();
-    if (!mensaje) return alert('Escribe tu mensaje');
+    if (!mensaje) {
+        showToast('Escribe tu mensaje', 'error');
+        document.getElementById('sugMensaje').focus();
+        return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
     const tipo = document.querySelector('input[name="tipo"]:checked').value;
-    const rating = document.querySelector('input[name="rating"]:checked').value;
+    const ratingEl = document.querySelector('input[name="rating"]:checked');
+    const rating = ratingEl ? ratingEl.value : '5';
+
     try {
         const res = await fetch('/api/sugerencias', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 tipo: tipo,
                 mensaje: mensaje,
                 nombre: document.getElementById('sugNombre').value || 'Anónimo',
                 telefono: document.getElementById('sugTelefono').value,
-                rating: rating
+                rating: parseInt(rating)
             })
         });
         const data = await res.json();
-        if (data.message || data.mensaje) {
-            alert('✅ ¡Gracias! Tu opinión es importante.');
-            e.target.reset();
-            document.getElementById('star5').checked = true;
+
+        if (data.id || data.message) {
+            gsap.to('#formContainer', {
+                opacity: 0,
+                y: -30,
+                duration: 0.4,
+                onComplete: () => {
+                    document.getElementById('formContainer').style.display = 'none';
+                    document.getElementById('successAnimation').classList.add('show');
+                    gsap.from('.success-icon', { scale: 0, duration: 0.6, ease: 'back.out(1.7)' });
+                    gsap.from('.success-animation h3', { opacity: 0, y: 20, duration: 0.5, delay: 0.3 });
+                    gsap.from('.success-animation p', { opacity: 0, y: 20, duration: 0.5, delay: 0.5 });
+                }
+            });
+        } else {
+            showToast(data.error || 'Error al enviar', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
         }
     } catch (err) {
-        alert('❌ Error al enviar');
+        showToast('Error de conexión', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
     }
 };
+
+function resetForm() {
+    document.getElementById('feedbackForm').reset();
+    document.getElementById('formContainer').style.display = 'block';
+    document.getElementById('successAnimation').classList.remove('show');
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').innerHTML = '<i class="bi bi-send"></i> Enviar Feedback';
+    document.getElementById('star5').checked = true;
+    gsap.from('#formContainer', { opacity: 0, y: 30, duration: 0.5 });
+}
+
+gsap.from('.page-header', { opacity: 0, y: -40, duration: 1, ease: 'power3.out' });
+gsap.from('.header-icon', { scale: 0.5, opacity: 0, duration: 0.8, delay: 0.3, ease: 'back.out(1.7)' });
+gsap.from('.feedback-card', { opacity: 0, y: 60, duration: 1, delay: 0.5, scrollTrigger: { trigger: '.feedback-card', start: 'top 80%' } });
 </script>
 {% endblock %}
