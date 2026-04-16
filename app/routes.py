@@ -214,6 +214,7 @@ def get_productos():
         'codigo': p.codigo, 
         'nombre': p.nombre, 
         'descripcion': p.descripcion,
+        'ingredientes': p.ingredientes,
         'precio': p.precio, 
         'categoria': p.categoria, 
         'imagen': p.imagen,
@@ -235,7 +236,7 @@ def producto_detalle(id):
     if request.method in ['PUT', 'PATCH']:
         data = request.get_json(silent=True)
         if data:
-            for key in ['codigo', 'nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'disponible']:
+            for key in ['codigo', 'nombre', 'descripcion', 'ingredientes', 'precio', 'categoria', 'imagen', 'stock', 'disponible']:
                 if key in data:
                     setattr(producto, key, data[key])
             db.session.commit()
@@ -246,6 +247,7 @@ def producto_detalle(id):
         'codigo': producto.codigo, 
         'nombre': producto.nombre,
         'descripcion': producto.descripcion,
+        'ingredientes': producto.ingredientes,
         'precio': producto.precio,
         'categoria': producto.categoria,
         'imagen': producto.imagen,
