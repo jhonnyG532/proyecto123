@@ -239,8 +239,40 @@
 
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; }
+            .main-content { margin-left: 0; padding: 16px; }
+            .top-bar { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .top-bar h1 { font-size: 1.4rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card { padding: 16px; }
+            .stat-icon { width: 40px; height: 40px; font-size: 1rem; }
+            .stat-info h3 { font-size: 1.2rem; }
+            .card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .card-body { padding: 16px; }
+            .form-control, .form-select { font-size: 0.9rem; padding: 10px 12px; }
         }
+        
+        @media (max-width: 576px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .top-bar-actions { width: 100%; justify-content: space-between; }
+            .btn { padding: 8px 12px; font-size: 0.85rem; }
+            .table { font-size: 0.8rem; }
+            .action-btn { width: 28px; height: 28px; font-size: 0.8rem; }
+        }
+        
+        /* Loading states */
+        .loading { opacity: 0.5; pointer-events: none; }
+        .spinner {
+            width: 20px; height: 20px; border: 2px solid var(--border-color);
+            border-top-color: var(--accent-primary); border-radius: 50%;
+            animation: spin 0.8s linear infinite; display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state {
+            text-align: center; padding: 40px 20px; color: var(--text-muted);
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+    </style>
     </style>
 </head>
 <body>
@@ -396,7 +428,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 d-flex align-items-end gap-2">
-                            <button class="btn btn-success" onclick="saveProduct()">
+                            <button class="btn btn-success" id="btnSaveProduct" onclick="saveProduct()">
                                 <i class="bi bi-check-lg"></i> Guardar
                             </button>
                             <button class="btn btn-outline" onclick="newProduct()">
@@ -596,6 +628,9 @@
     }
 
     async function loadDashboard() {
+        var d = document.getElementById('statProducts');
+        d.innerHTML = '<span class="spinner"></span>';
+        
         var [prods, cats, sugs] = await Promise.all([
             fetch('/api/productos', { headers: { 'Authorization': 'Bearer ' + tk } }).then(r => r.json()),
             fetch('/api/categorias?all=1', { headers: { 'Authorization': 'Bearer ' + tk } }).then(r => r.json()),
@@ -684,7 +719,11 @@
     function saveProduct() {
         var nom = document.getElementById('prodNombre').value.trim();
         var pre = parseInt(document.getElementById('prodPrecio').value) || 0;
-        if (!nom) return alert('Nombre requerido');
+        if (!nom || !pre) return alert('Nombre y precio requeridos');
+        
+        var btn = document.getElementById('btnSaveProduct');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>';
         
         var id = document.getElementById('prodId').value;
         var url = id ? '/api/productos/' + id : '/api/productos';
@@ -703,8 +742,16 @@
                 disponible: document.getElementById('prodDisp').value === 'true'
             })
         }).then(function(r) {
-            if (r.ok) { alert('Guardado'); loadProducts(); newProduct(); }
-            else alert('Error');
+            if (r.ok) { 
+                alert('✅ Guardado correctamente');
+                loadProducts(); 
+                newProduct(); 
+            } else {
+                alert('❌ Error al guardar');
+            }
+        }).finally(function() {
+            btn.disabled = false;
+            btn.innerHTML = '💾 Guardar';
         });
     }
 
