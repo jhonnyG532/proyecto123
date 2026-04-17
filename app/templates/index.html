@@ -375,27 +375,14 @@
     color: var(--text-secondary);
     cursor: pointer;
 }
-.offcanvas .ing-item input {
-    width: 14px;
-    height: 14px;
-    accent-color: var(--accent-primary);
-}
-.offcanvas .ing-item {
-    flex-direction: row-reverse;
-    justify-content: space-between;
-}
-.offcanvas .ing-item input:checked + span, .offcanvas .ing-item input + span {
-    color: var(--text-secondary);
-}
-.offcanvas .ing-item input:not(:checked) + span {
-    color: #ff6b6b;
-    text-decoration: line-through;
-}
-.offcanvas .text-warning {
-    color: #ff6b6b;
-    font-size: 0.75rem;
-    display: block;
-    margin: 4px 0;
+.offcanvas .ing-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 4px 4px 4px 0;
+    background: rgba(0, 245, 212, 0.1);
+    border-radius: 15px;
+    font-size: 0.8rem;
+    color: var(--accent-primary);
 }
 .offcanvas .cart-item-actions {
     display: flex;
@@ -684,20 +671,16 @@ function updateCart() {
             html += '<div class="cart-item">';
             html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6>';
             if (item.ingredientes) {
-                var ings = item.ingredientes.split('\n').filter(function(x) { return x.trim(); });
-                html += '<div class="ingredient-checklist" data-index="' + i + '">';
+                var ings = item.ingredientes.split('\n');
+                html += '<div class="ingredient-checklist">';
                 for (var j = 0; j < ings.length; j++) {
-                    var ingName = ings[j].trim();
-                    var excluir = item.excluidos && item.excluidos.includes(ingName);
-                    var checked = excluir ? '' : 'checked';
-                    var estilo = excluir ? 'style="color:#ff6b6b;text-decoration:line-through;"' : '';
-                    html += '<label class="ing-item" ' + estilo + '><input type="checkbox" ' + checked + ' onchange="toggleIngrediente(' + i + ', ' + j + ', \'' + ingName.replace(/'/g, "\\'") + '\', this.checked)"> ' + ingName + '</label>';
+                    if (ings[j].trim()) {
+                        html += '<span class="ing-tag">' + ings[j] + '</span>';
+                    }
                 }
                 html += '</div>';
             }
-            if (item.excluidos && item.excluidos.length > 0) {
-                html += '<small class="text-warning">SIN: ' + item.excluidos.join(', ') + '</small>';
-            }
+            
             html += '<small>$' + item.precio + ' x ' + item.cantidad + '</small></div>';
             html += '<div class="cart-item-actions">';
             html += '<span class="cart-item-price">$' + subtotal + '</span>';
@@ -727,17 +710,6 @@ function updateCart() {
 
 function removeFromCart(index) {
     cart.splice(index, 1);
-    updateCart();
-}
-
-function toggleIngrediente(cartIndex, ingIndex, ingrediente, checked) {
-    if (!cart[cartIndex].excluidos) cart[cartIndex].excluidos = [];
-    var idx = cart[cartIndex].excluidos.indexOf(ingrediente);
-    if (checked && idx > -1) {
-        cart[cartIndex].excluidos.splice(idx, 1);
-    } else if (!checked && idx === -1) {
-        cart[cartIndex].excluidos.push(ingrediente);
-    }
     updateCart();
 }
 
@@ -785,9 +757,6 @@ function sendOrder() {
         var subtotal = item.precio * item.cantidad;
         total += subtotal;
         mensaje += '- ' + item.nombre + ' ' + item.cantidad + 'x @ $' + item.precio + ' = $' + subtotal + '\n';
-        if (item.excluidos && item.excluidos.length > 0) {
-            mensaje += '   SIN: ' + item.excluidos.join(', ') + '\n';
-        }
     }
     
     if (conDomicilio) total += COSTO_DOMICILIO;
