@@ -199,6 +199,7 @@ def get_productos():
             nombre=nombre[:100],
             descripcion=sanitize_html(data.get('descripcion', ''))[:500],
             ingredientes=sanitize_html(data.get('ingredientes', ''))[:500],
+            toppings=data.get('toppings', ''),
             precio=max(data.get('precio', 0), 0),
             categoria=sanitize_html(data.get('categoria', ''))[:50],
             imagen=sanitize_html(data.get('imagen', ''))[:300],
@@ -216,6 +217,7 @@ def get_productos():
         'nombre': p.nombre, 
         'descripcion': p.descripcion,
         'ingredientes': p.ingredientes,
+        'toppings': p.toppings,
         'precio': p.precio, 
         'categoria': p.categoria, 
         'imagen': p.imagen,
@@ -237,7 +239,7 @@ def producto_detalle(id):
     if request.method in ['PUT', 'PATCH']:
         data = request.get_json(silent=True)
         if data:
-            for key in ['codigo', 'nombre', 'descripcion', 'ingredientes', 'precio', 'categoria', 'imagen', 'stock', 'disponible']:
+            for key in ['codigo', 'nombre', 'descripcion', 'ingredientes', 'toppings', 'precio', 'categoria', 'imagen', 'stock', 'disponible']:
                 if key in data:
                     setattr(producto, key, data[key])
             db.session.commit()
@@ -249,6 +251,7 @@ def producto_detalle(id):
         'nombre': producto.nombre,
         'descripcion': producto.descripcion,
         'ingredientes': producto.ingredientes,
+        'toppings': producto.toppings,
         'precio': producto.precio,
         'categoria': producto.categoria,
         'imagen': producto.imagen,

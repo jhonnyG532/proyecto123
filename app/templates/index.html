@@ -221,6 +221,9 @@
 }
 .product-content {
     padding: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
 }
 .product-category {
     font-size: 0.75rem;
@@ -379,6 +382,38 @@
     accent-color: var(--accent-primary);
 }
 .offcanvas .cart-item-info small { color: var(--text-muted); }
+.offcanvas .cart-toppings {
+    margin: 12px 0;
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+}
+.offcanvas .cart-topping-cat {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 8px;
+}
+.offcanvas .cart-topping-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.offcanvas .cart-topping-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.offcanvas .cart-topping-opt input {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent-primary);
+}
 .offcanvas .cart-item-actions {
     display: flex;
     align-items: center;
@@ -514,7 +549,7 @@
                                         <span class="qty-value" id="qty-{{ item.id }}">1</span>
                                         <button class="qty-btn qty-plus" onclick="changeQty({{ item.id }}, 1)">+</button>
                                     </div>
-                                    <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.nombre|e }}', {{ item.precio }}, '{{ item.ingredientes|default('')|e }}')">
+                                    <button class="add-btn" onclick="addToCart({{ item.id }}, '{{ item.nombre|e }}', {{ item.precio }}, '{{ item.ingredientes|default('')|e }}', '{{ item.toppings|default('')|e }}')">
                                         <i class="bi bi-plus"></i>
                                     </button>
                                 </div>
@@ -615,9 +650,10 @@ function changeQty(id, delta) {
     el.textContent = val;
 }
 
-function addToCart(id, nombre, precio, ingredientes) {
+function addToCart(id, nombre, precio, ingredientes, toppings) {
     var cant = parseInt(document.getElementById('qty-' + id).textContent);
     ingredientes = ingredientes || '';
+    toppings = toppings || '';
     
     var existing = null;
     for (var i = 0; i < cart.length; i++) {
@@ -629,7 +665,7 @@ function addToCart(id, nombre, precio, ingredientes) {
     if (existing) {
         existing.cantidad += cant;
     } else {
-        cart.push({ id: id, nombre: nombre, precio: precio, cantidad: cant, ingredientes: ingredientes });
+        cart.push({ id: id, nombre: nombre, precio: precio, cantidad: cant, ingredientes: ingredientes, toppings: toppings, seleccionados: {} });
     }
     
     updateCart();
@@ -665,20 +701,29 @@ function updateCart() {
             count += item.cantidad;
 html += '<div class="cart-item">';
             html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6>';
-            if (item.ingredientes) {
-                html += '<div class="cart-ingredients">';
-                var ings = item.ingredientes.split('\n').filter(function(x) { return x.trim(); });
-                var excluded = item.excluidos || [];
-                for (var j = 0; j < ings.length; j++) {
-                    var ing = ings[j].trim();
-                    var excl = excluded.includes(ing);
-                    var style = excl ? 'color:#ff6b6b;text-decoration:line-through;' : '';
-                    html += '<label class="cart-ing-item" style="' + style + '">';
-                    html += '<input type="checkbox" ' + (excl ? '' : 'checked') + ' onchange="toggleIng(' + i + ', ' + j + ', \'' + ing.replace(/'/g, "\\'") + '\', this.checked)">';
-                    html += ' ' + ing + '</label>';
-                }
-                html += '</div>';
+            
+            if (item.toppings && item.toppings !== '') {
+                try {
+                    var toppingsData = JSON.parse(item.toppings);
+                    for (var cat in toppingsData) {
+                        var items = toppingsData[cat];
+                        html += '<div class="cart-toppings">';
+                        html += '<div class="cart-topping-cat">' + cat + '</div>';
+                        html += '<div class="cart-topping-opts">';
+                        for (var j = 0; j < items.length; j++) {
+                            var isSel = item.seleccionados && item.seleccionados[cat + '::' + items[j].name];
+                            var style = isSel ? '' : 'opacity:0.5;';
+                            html += '<label class="cart-topping-opt" style="' + style + '">';
+                            html += '<input type="checkbox" ' + (isSel ? 'checked' : '') + ' onchange="toggleTopping(' + i + ', \'' + cat + '\', \'' + items[j].name + '\', this.checked, ' + items[j].price + ')">';
+                            html += ' ' + items[j].name;
+                            if (items[j].price > 0) html += ' <span class="text-success">+$' + items[j].price + '</span>';
+                            html += '</label>';
+                        }
+                        html += '</div></div>';
+                    }
+                } catch(e) {}
             }
+            
             html += '<small class="text-muted">$' + item.precio + ' x ' + item.cantidad + '</small></div>';
             html += '<div class="cart-item-actions">';
             html += '<span class="cart-item-price">$' + subtotal + '</span>';
@@ -718,6 +763,17 @@ function toggleIng(cartIndex, ingIndex, ingName, checked) {
         cart[cartIndex].excluidos.splice(idx, 1);
     } else if (!checked && idx === -1) {
         cart[cartIndex].excluidos.push(ingName);
+    }
+    updateCart();
+}
+
+function toggleTopping(cartIndex, cat, name, checked, price) {
+    if (!cart[cartIndex].seleccionados) cart[cartIndex].seleccionados = {};
+    var key = cat + '::' + name;
+    if (checked) {
+        cart[cartIndex].seleccionados[key] = price;
+    } else {
+        delete cart[cartIndex].seleccionados[key];
     }
     updateCart();
 }

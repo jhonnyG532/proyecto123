@@ -278,6 +278,36 @@
             opacity: 1;
             color: #ff6b6b;
         }
+        
+        .toppings-list { margin-top: 12px; }
+        .topping-group {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        .topping-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .topping-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .topping-item i {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .topping-item i:hover {
+            opacity: 1;
+            color: #ff6b6b;
+        }
 
         .modal-content {
             background: var(--bg-surface);
@@ -478,12 +508,23 @@
                             <textarea class="form-control" id="prodDesc" rows="2" placeholder="Descripcion del producto"></textarea>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Ingredientes</label>
-                            <div id="ingredientesList" class="ingredientes-edit-list"></div>
-                            <div class="input-group mt-2">
-                                <input type="text" class="form-control" id="newIngrediente" placeholder="Nuevo ingrediente" onkeypress="if(event.key==='Enter')addIngrediente()">
-                                <button class="btn btn-outline" type="button" onclick="addIngrediente()"><i class="bi bi-plus"></i> Agregar</button>
+                            <label class="form-label">
+                                <i class="bi bi-list-check me-2"></i>Opciones de Personalización
+                                <small class="text-muted ms-2">(Ej: toppings, tamaños, ingredientes extra)</small>
+                            </label>
+                            <div id="toppingsContainer">
+                                <div class="topping-category mb-3 p-3" style="background:rgba(255,255,255,0.02);border-radius:8px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <input type="text" class="form-control" id="newToppingCat" placeholder="Nombre de categoría (ej: Vegetales, salsas)" style="max-width:200px;">
+                                        <button class="btn btn-sm btn-outline" onclick="addToppingCategory()"><i class="bi bi-plus"></i></button>
+                                    </div>
+                                    <div id="toppingsList" class="toppings-list"></div>
+                                </div>
                             </div>
+                            <p class="text-muted small mt-2">
+                                <i class="bi bi-info-circle"></i> Los clientes podrán seleccionar estas opciones al ordenar. Dejar vacío si no necesita personalización.
+                            </p>
+                        </div>
                             <textarea class="form-control mt-2" id="prodIng" rows="2" placeholder="Carne 100%&#10;Cebolla grille&#10;Queso cheddar" style="display:none;"></textarea>
                         </div>
                         <div class="col-md-3">
@@ -778,6 +819,13 @@
         currentIngredientes = p.ingredientes ? p.ingredientes.split('\n').filter(function(i) { return i.trim(); }) : [];
         renderIngredientesList();
         
+        if (p.toppings) {
+            loadToppingsFromField(p.toppings);
+        } else {
+            currentToppings = {};
+            renderToppings();
+        }
+        
         document.getElementById('productFormTitle').textContent = 'Editar Producto';
     }
 
@@ -809,10 +857,82 @@
     function toggleIngredienteActive(index, checked) {
         // Keep in list but mark as unchecked
     }
+    
+    // ============= TOPPINGS SYSTEM =============
+    var currentToppings = {};
+    
+    function addToppingCategory() {
+        var catName = document.getElementById('newToppingCat').value.trim();
+        if (catName && !currentToppings[catName]) {
+            currentToppings[catName] = [];
+            document.getElementById('newToppingCat').value = '';
+            renderToppings();
+        }
+    }
+    
+    function renderToppings() {
+        var container = document.getElementById('toppingsList');
+        var html = '';
+        for (var cat in currentToppings) {
+            var items = currentToppings[cat];
+            html += '<div class="topping-group mb-3">';
+            html += '<h6 class="text-success mb-2"><i class="bi bi-chevron-right"></i> ' + cat + '</h6>';
+            html += '<div class="d-flex gap-2 mb-2">';
+            html += '<input type="text" class="form-control form-control-sm" id="newTopping_' + cat.replace(/\s/g, '_') + '" placeholder="Opción (ej: Lechuga)">';
+            html += '<input type="number" class="form-control form-control-sm" id="priceTopping_' + cat.replace(/\s/g, '_') + '" placeholder="+$0" style="max-width:80px;">';
+            html += '<button class="btn btn-sm btn-outline" onclick="addToppingItem(\'' + cat + '\')"><i class="bi bi-plus"></i></button>';
+            html += '</div>';
+            html += '<div class="topping-items">';
+            for (var i = 0; i < items.length; i++) {
+                html += '<label class="topping-item">';
+                html += '<input type="checkbox" checked> ' + items[i].name;
+                if (items[i].price > 0) html += ' <span class="text-success">+$' + items[i].price + '</span>';
+                html += ' <i class="bi bi-x-circle" onclick="removeToppingItem(\'' + cat + '\', ' + i + ')" style="cursor:pointer;"></i>';
+                html += '</label>';
+            }
+            html += '</div>';
+            html += '</div>';
+        }
+        container.innerHTML = html || '<p class="text-muted">Agrega una categoría para empezar</p>';
+        saveToppingsToField();
+    }
+    
+    function addToppingItem(cat) {
+        var nameInput = document.getElementById('newTopping_' + cat.replace(/\s/g, '_'));
+        var priceInput = document.getElementById('priceTopping_' + cat.replace(/\s/g, '_'));
+        var name = nameInput.value.trim();
+        var price = parseInt(priceInput.value) || 0;
+        if (name) {
+            currentToppings[cat].push({name: name, price: price});
+            nameInput.value = '';
+            priceInput.value = '';
+            renderToppings();
+        }
+    }
+    
+    function removeToppingItem(cat, index) {
+        currentToppings[cat].splice(index, 1);
+        renderToppings();
+    }
+    
+    function saveToppingsToField() {
+        document.getElementById('prodIng').value = JSON.stringify(currentToppings);
+    }
+    
+    function loadToppingsFromField(jsonStr) {
+        try {
+            currentToppings = jsonStr ? JSON.parse(jsonStr) : {};
+        } catch(e) {
+            currentToppings = {};
+        }
+        renderToppings();
+    }
 
     function newProduct() {
         currentIngredientes = [];
         renderIngredientesList();
+        currentToppings = {};
+        renderToppings();
         document.getElementById('prodId').value = '';
         document.getElementById('prodNombre').value = '';
         document.getElementById('prodPrecio').value = '';
@@ -848,6 +968,7 @@
                 categoria: document.getElementById('prodCat').value,
                 descripcion: document.getElementById('prodDesc').value,
                 ingredientes: document.getElementById('prodIng').value,
+                toppings: JSON.stringify(currentToppings),
                 imagen: document.getElementById('prodImg').value,
                 stock: parseInt(document.getElementById('prodStock').value) || 100,
                 disponible: document.getElementById('prodDisp').value === 'true'

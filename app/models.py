@@ -58,6 +58,7 @@ class Producto(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.Text)
     ingredientes = db.Column(db.Text)
+    toppings = db.Column(db.Text)
     precio = db.Column(db.Integer, default=0)
     categoria = db.Column(db.String(50))
     imagen = db.Column(db.String(300))
