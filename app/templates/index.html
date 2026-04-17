@@ -360,30 +360,6 @@
 }
 .offcanvas .cart-item-info h6 { margin: 0 0 4px; font-size: 0.95rem; }
 .offcanvas .cart-item-info small { color: var(--text-muted); }
-.offcanvas .ingredient-checklist {
-    margin: 8px 0;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-}
-.offcanvas .ing-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-    color: var(--text-secondary);
-    cursor: pointer;
-}
-.offcanvas .ing-tag {
-    display: inline-block;
-    padding: 4px 10px;
-    margin: 4px 4px 4px 0;
-    background: rgba(0, 245, 212, 0.1);
-    border-radius: 15px;
-    font-size: 0.8rem;
-    color: var(--accent-primary);
-}
 .offcanvas .cart-item-actions {
     display: flex;
     align-items: center;
@@ -669,18 +645,7 @@ function updateCart() {
             total += subtotal;
             count += item.cantidad;
             html += '<div class="cart-item">';
-            html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6>';
-            if (item.ingredientes) {
-                var ings = item.ingredientes.split('\n');
-                html += '<div class="ingredient-checklist">';
-                for (var j = 0; j < ings.length; j++) {
-                    if (ings[j].trim()) {
-                        html += '<span class="ing-tag">' + ings[j] + '</span>';
-                    }
-                }
-                html += '</div>';
-            }
-            
+html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6>';
             html += '<small>$' + item.precio + ' x ' + item.cantidad + '</small></div>';
             html += '<div class="cart-item-actions">';
             html += '<span class="cart-item-price">$' + subtotal + '</span>';
