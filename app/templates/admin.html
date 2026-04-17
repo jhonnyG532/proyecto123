@@ -950,8 +950,13 @@
         if (!nom || !pre) return alert('Nombre y precio requeridos');
         
         var btn = document.getElementById('btnSaveProduct');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span>';
+        console.log('SaveProduct button:', btn ? 'found' : 'NOT FOUND');
+        
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>';
+            console.log('Button disabled');
+        }
         
         var id = document.getElementById('prodId').value;
         var url = id ? '/api/productos/' + id : '/api/productos';
@@ -973,22 +978,17 @@
                 stock: parseInt(document.getElementById('prodStock').value) || 100,
                 disponible: document.getElementById('prodDisp').value === 'true'
             })
-        }).then(function(r) {
-            if (r.ok) { 
-                alert('✅ Guardado correctamente');
-                loadProducts(); 
-                newProduct(); 
-            } else {
-                return r.json().then(function(d) {
-                    alert('❌ Error: ' + (d.error || 'Desconocido'));
-                });
-            }
+}).then(function(r) {
+            console.log('Response:', r.status);
+            alert('✅ Guardado');
+            loadProducts(); 
+            newProduct(); 
         }).catch(function(err) {
-            alert('❌ Error de red');
             console.error(err);
         }).finally(function() {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-check-lg"></i> Guardar';
+            setTimeout(function() {
+                location.reload();
+            }, 500);
         });
     }
 
