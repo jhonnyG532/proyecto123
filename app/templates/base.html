@@ -326,7 +326,15 @@
             .product-card { min-height: auto; padding: 12px !important; }
             .product-image { height: 100px !important; }
             .product-name { font-size: 0.9rem; margin-bottom: 4px; }
-            .product-desc { font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+            .product-desc { 
+            font-size: 0.85rem; 
+            white-space: normal !important;
+            word-break: break-word;
+            line-height: 1.4;
+            overflow: visible !important;
+            display: block !important;
+            -webkit-line-clamp: none !important;
+        }
             .product-price { font-size: 1rem; }
             .product-footer { flex-direction: column; gap: 8px; align-items: stretch; }
             .product-actions { justify-content: space-between; }
