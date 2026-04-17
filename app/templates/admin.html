@@ -455,6 +455,7 @@
                                 <th>Nombre</th>
                                 <th>Precio</th>
                                 <th>Categoria</th>
+                                <th>Ingredientes</th>
                                 <th>Stock</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
@@ -673,10 +674,12 @@
 
     function renderProducts(prods) {
         document.getElementById('prodTable').innerHTML = prods.map(function(p) {
+            var ingText = p.ingredientes ? p.ingredientes.replace(/\n/g, ', ').substring(0, 30) + (p.ingredientes.length > 30 ? '...' : '') : '-';
             return '<tr>' +
                 '<td><strong>' + p.nombre + '</strong></td>' +
                 '<td>$' + p.precio.toLocaleString() + '</td>' +
                 '<td>' + (p.categoria || '-') + '</td>' +
+                '<td style="max-width:150px;font-size:0.75rem;">' + ingText + '</td>' +
                 '<td>' + p.stock + '</td>' +
                 '<td><span class="badge ' + (p.disponible ? 'badge-success' : 'badge-secondary') + '">' + (p.disponible ? 'Activo' : 'Inactivo') + '</span></td>' +
                 '<td>' +
@@ -684,7 +687,7 @@
                     '<button class="action-btn delete" onclick="delP(' + p.id + ')"><i class="bi bi-trash"></i></button>' +
                 '</td>' +
             '</tr>';
-        }).join('') || '<tr><td colspan="6" class="text-center text-muted py-4">No hay productos</td></tr>';
+        }).join('') || '<tr><td colspan="7" class="text-center text-muted py-4">No hay productos</td></tr>';
     }
 
     function filterProducts() {

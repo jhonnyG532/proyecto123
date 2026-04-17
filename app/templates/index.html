@@ -170,6 +170,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
+    min-height: 200px;
+}
+.category-section {
+    display: block !important;
+}
+.product-card {
+    opacity: 1 !important;
 }
 .product-card {
     background: var(--bg-surface);
@@ -811,15 +818,10 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
         document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
         this.classList.add('active');
         
-        var filter = this.dataset.filter;
+        // Show all categories
         var sections = document.querySelectorAll('.category-section');
-        
         sections.forEach(function(section) {
-            if (filter === 'todos' || section.dataset.category === filter) {
-                section.style.display = 'block';
-            } else {
-                section.style.display = 'none';
-            }
+            section.style.display = 'block';
         });
     });
 });
