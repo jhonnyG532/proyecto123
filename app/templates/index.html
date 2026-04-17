@@ -611,9 +611,8 @@ function changeQty(id, delta) {
     el.textContent = val;
 }
 
-function addToCart(id, nombre, precio, ingredientes) {
+function addToCart(id, nombre, precio) {
     var cant = parseInt(document.getElementById('qty-' + id).textContent);
-    ingredientes = ingredientes || '';
     var existing = null;
     for (var i = 0; i < cart.length; i++) {
         if (cart[i].id === id) {
@@ -624,7 +623,7 @@ function addToCart(id, nombre, precio, ingredientes) {
     if (existing) {
         existing.cantidad += cant;
     } else {
-        cart.push({ id: id, nombre: nombre, precio: precio, cantidad: cant, ingredientes: ingredientes });
+        cart.push({ id: id, nombre: nombre, precio: precio, cantidad: cant });
     }
     
     updateCart();
