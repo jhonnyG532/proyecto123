@@ -31,9 +31,43 @@
         }
         h1, h2, h3, h4, h5 { font-family: 'Syne', sans-serif; }
 
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-deep); }
         ::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 3px; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        .empty-state h4 {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+        }
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
 
         .sidebar {
             position: fixed;
@@ -687,7 +721,7 @@
                 '<td><span class="badge ' + (p.disponible ? 'badge-success' : 'badge-secondary') + '">' + (p.disponible ? 'Activo' : 'Inactivo') + '</span></td>' +
                 '<td><button class="action-btn edit" onclick="showTab(\'productos\'); editP(' + p.id + ')"><i class="bi bi-pencil"></i></button></td>' +
             '</tr>';
-        }).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">No hay productos</td></tr>';
+        }).join('') || '<tr><td colspan="7" class="text-center py-5"><div class="empty-state"><i class="bi bi-burger"></i><h4>No hay productos</h4><p>Crea tu primer producto</p></div></td></tr>';
     }
 
     async function loadProducts() {
@@ -719,7 +753,7 @@
                     '<button class="action-btn delete" onclick="delP(' + p.id + ')"><i class="bi bi-trash"></i></button>' +
                 '</td>' +
             '</tr>';
-        }).join('') || '<tr><td colspan="7" class="text-center text-muted py-4">No hay productos</td></tr>';
+        }).join('') || '<tr><td colspan="7" class="text-center py-5"><div class="empty-state"><i class="bi bi-burger"></i><h4>No hay productos</h4><p>Agrega tu primer producto</p></div></td></tr>';
     }
 
     function filterProducts() {
@@ -752,8 +786,8 @@
     function renderIngredientesList() {
         var container = document.getElementById('ingredientesList');
         container.innerHTML = currentIngredientes.map(function(ing, i) {
-            return '<span class="ing-tag"><input type="checkbox" checked onchange="toggleIngredienteActive(' + i + ', this.checked)"> ' + ing + ' <i class="bi bi-x" onclick="removeIngrediente(' + i + ')" style="cursor:pointer;"></i></span>';
-        }).join('');
+            return '<span class="ing-tag">' + ing + ' <i class="bi bi-x-circle-fill" onclick="removeIngrediente(' + i + ')" style="cursor:pointer;margin-left:4px;"></i></span>';
+        }).join('') || '<span class="text-muted">Sin ingredientes</span>';
         document.getElementById('prodIng').value = currentIngredientes.join('\n');
     }
 
@@ -856,7 +890,7 @@
                     '<button class="action-btn delete" onclick="delC(' + c.id + ')"><i class="bi bi-trash"></i></button>' +
                 '</td>' +
             '</tr>';
-        }).join('') || '<tr><td colspan="4" class="text-center text-muted py-4">No hay categorias</td></tr>';
+        }).join('') || '<tr><td colspan="4" class="text-center py-5"><div class="empty-state"><i class="bi bi-tags"></i><h4>No hay categorías</h4><p>Crea tu primera categoría</p></div></td></tr>';
     }
 
     async function editC(id) {
@@ -905,7 +939,7 @@
                 '<td>' + fecha + '</td>' +
                 '<td><button class="action-btn delete" onclick="delSug(' + s.id + ')"><i class="bi bi-trash"></i></button></td>' +
             '</tr>';
-        }).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">No hay sugerencias</td></tr>';
+        }).join('') || '<tr><td colspan="5" class="text-center py-5"><div class="empty-state"><i class="bi bi-chat-heart"></i><h4>No hay sugerencias</h4><p>Las sugerencias aparecerán aquí</p></div></td></tr>';
     }
 
     function delSug(id) {
