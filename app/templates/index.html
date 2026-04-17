@@ -684,11 +684,14 @@ function updateCart() {
             html += '<div class="cart-item">';
             html += '<div class="cart-item-info"><h6>' + item.nombre + '</h6>';
             if (item.ingredientes) {
-                var ings = item.ingredientes.split('\n');
+                var ings = item.ingredientes.split('\n').filter(function(x) { return x.trim(); });
                 html += '<div class="ingredient-checklist" data-index="' + i + '">';
                 for (var j = 0; j < ings.length; j++) {
-                    var checked = (item.excluidos && item.excluidos.includes(ings[j])) ? '' : 'checked';
-                    html += '<label class="ing-item"><input type="checkbox" ' + checked + ' onchange="toggleIngrediente(' + i + ', \'' + ings[j] + '\', this.checked)"> ' + ings[j] + '</label>';
+                    var ingName = ings[j].trim();
+                    var excluir = item.excluidos && item.excluidos.includes(ingName);
+                    var checked = excluir ? '' : 'checked';
+                    var estilo = excluir ? 'style="color:#ff6b6b;text-decoration:line-through;"' : '';
+                    html += '<label class="ing-item" ' + estilo + '><input type="checkbox" ' + checked + ' onchange="toggleIngrediente(' + i + ', ' + j + ', \'' + ingName.replace(/'/g, "\\'") + '\', this.checked)"> ' + ingName + '</label>';
                 }
                 html += '</div>';
             }
@@ -727,7 +730,7 @@ function removeFromCart(index) {
     updateCart();
 }
 
-function toggleIngrediente(cartIndex, ingrediente, checked) {
+function toggleIngrediente(cartIndex, ingIndex, ingrediente, checked) {
     if (!cart[cartIndex].excluidos) cart[cartIndex].excluidos = [];
     var idx = cart[cartIndex].excluidos.indexOf(ingrediente);
     if (checked && idx > -1) {

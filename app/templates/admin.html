@@ -217,6 +217,33 @@
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        
+        .ingredientes-edit-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 40px;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        .ing-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(0,245,212,0.15);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+        }
+        .ing-tag i {
+            opacity: 0.7;
+        }
+        .ing-tag i:hover {
+            opacity: 1;
+            color: #ff6b6b;
+        }
 
         .modal-content {
             background: var(--bg-surface);
@@ -417,8 +444,13 @@
                             <textarea class="form-control" id="prodDesc" rows="2" placeholder="Descripcion del producto"></textarea>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Ingredientes (uno por linea)</label>
-                            <textarea class="form-control" id="prodIng" rows="3" placeholder="Carne 100%&#10;Cebolla grille&#10;Queso cheddar"></textarea>
+                            <label class="form-label">Ingredientes</label>
+                            <div id="ingredientesList" class="ingredientes-edit-list"></div>
+                            <div class="input-group mt-2">
+                                <input type="text" class="form-control" id="newIngrediente" placeholder="Nuevo ingrediente" onkeypress="if(event.key==='Enter')addIngrediente()">
+                                <button class="btn btn-outline" type="button" onclick="addIngrediente()"><i class="bi bi-plus"></i> Agregar</button>
+                            </div>
+                            <textarea class="form-control mt-2" id="prodIng" rows="2" placeholder="Carne 100%&#10;Cebolla grille&#10;Queso cheddar" style="display:none;"></textarea>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Stock</label>
@@ -705,21 +737,54 @@
         document.getElementById('prodPrecio').value = p.precio;
         document.getElementById('prodCat').value = p.categoria || '';
         document.getElementById('prodDesc').value = p.descripcion || '';
-        document.getElementById('prodIng').value = p.ingredientes || '';
         document.getElementById('prodImg').value = p.imagen || '';
         document.getElementById('prodStock').value = p.stock;
         document.getElementById('prodDisp').value = p.disponible ? 'true' : 'false';
+        
+        currentIngredientes = p.ingredientes ? p.ingredientes.split('\n').filter(function(i) { return i.trim(); }) : [];
+        renderIngredientesList();
+        
         document.getElementById('productFormTitle').textContent = 'Editar Producto';
     }
 
+    var currentIngredientes = [];
+
+    function renderIngredientesList() {
+        var container = document.getElementById('ingredientesList');
+        container.innerHTML = currentIngredientes.map(function(ing, i) {
+            return '<span class="ing-tag"><input type="checkbox" checked onchange="toggleIngredienteActive(' + i + ', this.checked)"> ' + ing + ' <i class="bi bi-x" onclick="removeIngrediente(' + i + ')" style="cursor:pointer;"></i></span>';
+        }).join('');
+        document.getElementById('prodIng').value = currentIngredientes.join('\n');
+    }
+
+    function addIngrediente() {
+        var input = document.getElementById('newIngrediente');
+        var ing = input.value.trim();
+        if (ing && !currentIngredientes.includes(ing)) {
+            currentIngredientes.push(ing);
+            input.value = '';
+            renderIngredientesList();
+        }
+    }
+
+    function removeIngrediente(index) {
+        currentIngredientes.splice(index, 1);
+        renderIngredientesList();
+    }
+
+    function toggleIngredienteActive(index, checked) {
+        // Keep in list but mark as unchecked
+    }
+
     function newProduct() {
+        currentIngredientes = [];
+        renderIngredientesList();
         document.getElementById('prodId').value = '';
         document.getElementById('prodNombre').value = '';
         document.getElementById('prodPrecio').value = '';
         document.getElementById('prodCat').value = '';
         document.getElementById('prodDesc').value = '';
         document.getElementById('prodImg').value = '';
-        document.getElementById('prodIng').value = '';
         document.getElementById('prodStock').value = '100';
         document.getElementById('prodDisp').value = 'true';
         document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
