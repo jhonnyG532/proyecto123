@@ -93,7 +93,7 @@ def sugerencias():
     wa_open = whatsapp_chat_url(wa)
     ig = instagram_url_from_handle(configuracion.instagram or '')
     return render_template('sugerencias.html', 
-        configuracion=configuracion, whatsapp_digits=wa, whatsapp_url_open=wa_open, instagram_url=ig)
+        configuracion=configuracion, config=configuracion, whatsapp_digits=wa, whatsapp_url_open=wa_open, instagram_url=ig)
 
 @main_bp.route('/' + SECRET_ADMIN_PATH)
 def admin():
